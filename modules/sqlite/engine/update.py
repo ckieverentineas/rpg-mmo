@@ -29,35 +29,18 @@ def set_player_attack(idvk):
     status = f'У вас {point} очков. Повышение невозможно.'
     return status
 
-def set_player_defmagic(idvk):
+def set_player_defence(idvk):
     #добавление магической защиты
-    source = select('player','defmagic, points', idvk)
+    source = select('player','defence, points', idvk)
     point = source[0]["points"]
     if (point > 0):
-        stats = source[0]["defmagic"]
+        stats = source[0]["defence"]
         stat = stats + 1
-        update('player','defmagic', stat, idvk)
+        update('player','defence', stat, idvk)
         point = point - 1
         update('player','points', point, idvk)
-        print(f'{idvk} have {stat} defmagic')
-        status = f'Ваша магическая защита возросла с {stats} до {stat} \n Очков осталось {point}'
-        return status
-    print(f'{idvk} have not points more.')
-    status = f'У вас {point} очков. Повышение невозможно.'
-    return status
-
-def set_player_defphysical(idvk):
-    #добавление атаки
-    source = select('player','defphysical, points', idvk)
-    point = source[0]["points"]
-    if (point > 0):
-        stats = source[0]["defphysical"]
-        stat = stats + 1
-        update('player','defphysical', stat, idvk)
-        point = point - 1
-        update('player','points', point, idvk)
-        print(f'{idvk} have {stat} defphysical')
-        status = f'Ваша физическая защита возросла с {stats} до {stat} \n Очков осталось {point}'
+        print(f'{idvk} have {stat} defence')
+        status = f'Ваша защита возросла с {stats} до {stat} \n Очков осталось {point}'
         return status
     print(f'{idvk} have not points more.')
     status = f'У вас {point} очков. Повышение невозможно.'
@@ -123,7 +106,7 @@ def clear_player_points(idvk):
         return status
 
     #сброс параметров персонажа
-    source = select('player','attack, defmagic, defphysical, dexterity, intelligence, health, points', idvk)
+    source = select('player','attack, defence, dexterity, intelligence, health, points', idvk)
     point = 0
     points = source[0]["points"]
     status = ""
@@ -132,16 +115,11 @@ def clear_player_points(idvk):
     point = point + stat
     update('player','attack', 0, idvk)
     status += gen_status('Атака', stat)
-    # обнуляем магическую защиту
-    stat = source[0]["defmagic"]
+    # обнуляем защиту
+    stat = source[0]["defence"]
     point = point + stat
-    update('player','defmagic', 0, idvk)
-    status += gen_status('Магическая защита', stat)
-    #обнуляем физическую защиту
-    stat = source[0]["defphysical"]
-    point = point + stat
-    update('player','defphysical', 0, idvk)
-    status += gen_status('Физическая защита', stat)
+    update('player','defence', 0, idvk)
+    status += gen_status('Защита', stat)
     #обнуляем ловкость
     stat = source[0]["dexterity"]
     point = point + stat

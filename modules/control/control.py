@@ -1,20 +1,19 @@
-from modules.sqlite.engine.update import clear_player_points, set_player_attack, set_player_defmagic, set_player_defphysical, set_player_dexterity, set_player_health, set_player_intelligence
+from modules.sqlite.engine.update import *
 from modules.sqlite.engine.add import register
 from modules.sqlite.engine.printer import *
 
 def checking(idvk, text):
     config = {
         "профиль": print_profile,
-        "моб": mob_profile,
         "начать": register,
         "назад": back,
         "+атк": set_player_attack,
-        "+мзащ":set_player_defmagic,
-        "+фзащ":set_player_defphysical,
+        "+защ":set_player_defence,
         "+лвк":set_player_dexterity,
         "+инт":set_player_intelligence,
         "+здр":set_player_health,
-        "сброс": clear_player_points
+        "сброс": clear_player_points,
+        "моб": print_mob_profile
     }
     try:
         text = text.lower()
