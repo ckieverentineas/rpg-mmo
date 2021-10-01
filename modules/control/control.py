@@ -1,3 +1,4 @@
+from modules.sqlite.engine.gen import reseach
 from modules.sqlite.engine.update import *
 from modules.sqlite.engine.add import register
 from modules.sqlite.engine.printer import *
@@ -13,7 +14,7 @@ def checking(idvk, text):
         "+инт":set_player_intelligence,
         "+здр":set_player_health,
         "сброс": clear_player_points,
-        "моб": print_mob_profile
+        "исследовать": reseach
     }
     try:
         text = text.lower()

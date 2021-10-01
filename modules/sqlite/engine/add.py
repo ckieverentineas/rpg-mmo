@@ -64,6 +64,11 @@ def generate_mob(idvk):
         if(points > 0):
             health = health + 2
             points = points - 1
+    attack = attack + randint(0,lvl)*random()
+    defence = defence + randint(0,lvl)*random()
+    dexterity = dexterity + randint(0,lvl)*random()
+    intelligence = intelligence + randint(0,lvl)*random()
+    health = health + randint(0,lvl)*random()
     cursor = con()
     #Инициализация нового игрока
     sqlite_insert_with_param = """INSERT OR IGNORE INTO mob
@@ -77,3 +82,28 @@ def generate_mob(idvk):
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
+    print(f'Mob was generated')
+
+def generate_battle(idvk):
+    #инициализация битвы
+    mob = select('mob', 'lvl, xp, gold, points, attack, defence, dexterity, intelligence, health', idvk)
+    player = select('player', 'lvl, xp, gold, points, attack, defence, dexterity, intelligence, health', idvk)
+    crdate = datetime.datetime.now()
+    cursor = con()
+    #подготовка к битве
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO battlepve
+                                (idvk, attackplayer, defenceplayer, dexterityplayer,
+                                 intelligenceplayer, healthplayer, manaplayer,
+                                 attackmob, defencemob, dexteritymob,
+                                 intelligencemob, healthmob, manamob, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, player[0]["attack"], player[0]["defence"],
+                  player[0]["dexterity"], player[0]["intelligence"],
+                  player[0]["health"], player[0]["intelligence"],
+                  mob[0]["attack"], mob[0]["defence"],
+                  mob[0]["dexterity"], mob[0]["intelligence"],
+                  mob[0]["health"], mob[0]["intelligence"], crdate)
+    cursor.execute(sqlite_insert_with_param, data_tuple)
+    cursor.commit()
+    cursor.close()
+    print(f'Mob and Player added in Temp for {idvk}')

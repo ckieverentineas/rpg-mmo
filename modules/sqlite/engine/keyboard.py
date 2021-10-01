@@ -10,7 +10,8 @@ def keyboards(text):
         "+лвк": keyboard_points_up,
         "+инт": keyboard_points_up,
         "+здр": keyboard_points_up,
-        "сброс": keyboard_points_up
+        "сброс": keyboard_points_up,
+        "исследовать": keyboard_battle
     }
     try:
         keyboards = config[text.lower()]()
@@ -57,4 +58,11 @@ def keyboard_back():
     keyboards.add_button('Профиль', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
+    return keyboards
+
+def keyboard_battle():
+    keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('Атака', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('Сбежать', color=VkKeyboardColor.POSITIVE)
     return keyboards
