@@ -4,5 +4,5 @@ __pycache__/
 /.vscode
 /.venv
 config.py
-
+config
 
