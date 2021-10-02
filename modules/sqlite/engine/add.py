@@ -94,21 +94,24 @@ def generate_mob(idvk):
 
 def generate_battle(idvk):
     #инициализация битвы
-    mob = select('mob', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
-    player = select('player', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+    mob = select('mob', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+    player = select('player', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     crdate = datetime.datetime.now()
     cursor = con()
-    #подготовка к битве
-    sqlite_insert_with_param = """INSERT OR IGNORE INTO battlepve
-                                (idvk, attackplayer, defenceplayer, defencemagicplayer, dexterityplayer,
-                                 intelligenceplayer, healthplayer, manaplayer,
-                                 attackmob, defencemob, defencemagicmob, dexteritymob,
-                                 intelligencemob, healthmob, manamob, crdate)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    #подготовка к битве игрока
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO player_current
+                                (idvk, attack, defence, defencemagic, dexterity, intelligence, health, mana, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
     data_tuple = (idvk, player[0]["attack"], player[0]["defence"], player[0]["defencemagic"],
                   player[0]["dexterity"], player[0]["intelligence"],
-                  player[0]["health"], player[0]["intelligence"]*2,
-                  mob[0]["attack"], mob[0]["defence"], mob[0]["defencemagic"],
+                  player[0]["health"], player[0]["intelligence"]*2, crdate)
+    cursor.execute(sqlite_insert_with_param, data_tuple)
+    cursor.commit()
+    #подготовка к битве моба
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO mob_current
+                                (idvk, attack, defence, defencemagic, dexterity, intelligence, health, mana, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, mob[0]["attack"], mob[0]["defence"], mob[0]["defencemagic"],
                   mob[0]["dexterity"], mob[0]["intelligence"],
                   mob[0]["health"], mob[0]["intelligence"]*2, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)

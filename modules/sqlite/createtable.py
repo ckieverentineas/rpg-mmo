@@ -35,23 +35,29 @@ def createdb():
     crdate datetime)
     """)
     cursor.commit()
-    cursor.execute("""CREATE TABLE IF NOT EXISTS battlepve
+    cursor.execute("""CREATE TABLE IF NOT EXISTS player_current
     (id INTEGER PRIMARY KEY,
     idvk INTEGER NOT NULL UNIQUE,
-    attackplayer INTEGER NOT NULL,
-    defenceplayer INTEGER NOT NULL,
-    defencemagicplayer INTEGER NOT NULL,
-    dexterityplayer INTEGER NOT NULL,
-    intelligenceplayer INTEGER NOT NULL,
-    healthplayer INTEGER NOT NULL,
-    manaplayer INTEGER NOT NULL,
-    attackmob INTEGER NOT NULL,
-    defencemob INTEGER NOT NULL,
-    defencemagicmob INTEGER NOT NULL,
-    dexteritymob INTEGER NOT NULL,
-    intelligencemob INTEGER NOT NULL,
-    healthmob INTEGER NOT NULL,
-    manamob INTEGER NOT NULL,
+    attack INTEGER NOT NULL,
+    defence INTEGER NOT NULL,
+    defencemagic INTEGER NOT NULL,
+    dexterity INTEGER NOT NULL,
+    intelligence INTEGER NOT NULL,
+    health INTEGER NOT NULL,
+    mana INTEGER NOT NULL,
+    crdate datetime)
+    """)
+    cursor.commit()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS mob_current
+    (id INTEGER PRIMARY KEY,
+    idvk INTEGER NOT NULL UNIQUE,
+    attack INTEGER NOT NULL,
+    defence INTEGER NOT NULL,
+    defencemagic INTEGER NOT NULL,
+    dexterity INTEGER NOT NULL,
+    intelligence INTEGER NOT NULL,
+    health INTEGER NOT NULL,
+    mana INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()
