@@ -1,7 +1,9 @@
 import datetime
+from os import stat
 from random import randint, random
 from modules.sqlite.connect import con
-from modules.sqlite.engine.select import be, select
+from modules.sqlite.engine.select import battle_dexterity_equal, be, select
+from modules.sqlite.engine.update import *
 
 def register(idvk):
     #создание персонажа
@@ -33,14 +35,17 @@ def register(idvk):
         cursor.commit()
         cursor.close()
         print(f'Register new master: {idvk}.')
-        return (f'Приветствую нового рунного мастера!')   
+        status = f'\n\n Приветствую нового рунного мастера! \n\n'
+        status += generate_setting_for_player(idvk)
+        return status  
     print(f'Master not forrgot skills {idvk}.') 
-    return(f'Рунные мастера не сдаются.')
+    status = f'Рунные мастера не сдаются'
+    return status
 
 
 def generate_mob(idvk):
     #задание параметров
-    source = select('player', 'lvl', idvk)
+    source = select('setting', 'lvl', idvk)
     lvl = int(source[0]["lvl"])
     attack = 0
     defence = 0
@@ -117,4 +122,24 @@ def generate_battle(idvk):
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
+    costattack = battle_dexterity_equal(idvk)
+    update('setting', 'costattack', costattack, idvk)
     print(f'Generate PVE event for {idvk}')
+
+def generate_setting_for_player(idvk):
+    #создание настроек персонажа
+    lvl = 0
+    costattack = 0
+    crdate = datetime.datetime.now()
+    cursor = con()
+    #Инициализация нового игрока
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO setting
+                                (idvk, lvl, costattack, crdate)
+                                VALUES (?, ?, ?, ?);"""
+    data_tuple = (idvk, lvl, costattack, crdate)
+    cursor.execute(sqlite_insert_with_param, data_tuple)
+    cursor.commit()
+    cursor.close()
+    print(f'Settings init for player: {idvk}')
+    status = f'\n\n Параметры персонажа инициализированы \n\n'
+    return status  

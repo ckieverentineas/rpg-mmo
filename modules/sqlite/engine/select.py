@@ -19,12 +19,6 @@ def battle_dexterity_equal(idvk):
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
     if (player[0]["dexterity"] > mob[0]["dexterity"]):
-        #ход игрока
-        
-        print(f'Ходит игрок')
-        #проверка на готовность доп хода игроком
-        #атака по мобу
+        return mob[0]["dexterity"]
     else:
-        #ход врага
-        #проверка на доп ходы мобом их активация
-        print(f'Ходит враг')
+        return player[0]["dexterity"]

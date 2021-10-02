@@ -184,6 +184,19 @@ def player_attack_defence(idvk):
         update('player_current', 'attack', player[0]["attack"]-1, idvk)
     if (mob[0]["defence"] > 0 ):
         update('mob_current', 'defence', mob[0]["defence"]-1, idvk)
-    status += print_battle_turn_mob(idvk)
-    status += print_battle_turn_player(idvk)
     return status
+
+def battle_control(idvk):
+    costattack = select('setting', 'costattack', idvk)
+    playerdex = select('player_current', 'dexterity', idvk)
+    mobdex = select('mob_current', 'dexterity', idvk)
+    player = select('player', 'dexterity', idvk)
+    mob = select('mob', 'dexterity', idvk)
+    if (player[0]["dexterity"] > mob[0]["dexterity"]):
+        while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
+            status = player_attack_defence(idvk)
+            update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
+            status += print_battle_turn_mob(idvk)
+            status += print_battle_turn_player(idvk)
+            return status
+

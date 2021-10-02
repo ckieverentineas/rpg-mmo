@@ -76,4 +76,12 @@ def createdb():
     crdate datetime)
     """)
     cursor.commit()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS setting
+    (id INTEGER PRIMARY KEY,
+    idvk INTEGER NOT NULL UNIQUE,
+    lvl INTEGER NOT NULL,
+    costattack INTEGER NOT NULL,
+    crdate datetime)
+    """)
+    cursor.commit()
     cursor.close()
