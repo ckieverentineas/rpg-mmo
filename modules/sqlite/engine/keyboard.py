@@ -6,7 +6,8 @@ def keyboards(text):
         "профиль": keyboard_profile,
         "назад": keyboard_back,
         "+атк": keyboard_points_up,
-        "+защ": keyboard_points_up,
+        "+фзащ": keyboard_points_up,
+        "+мзащ": keyboard_points_up,
         "+лвк": keyboard_points_up,
         "+инт": keyboard_points_up,
         "+здр": keyboard_points_up,
@@ -33,7 +34,9 @@ def keyboard_profile():
     keyboards.add_button('+лвк', color=VkKeyboardColor.POSITIVE)
     keyboards.add_button('+инт', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
-    keyboards.add_button('+защ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+фзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+мзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
     keyboards.add_button('СБРОС', color=VkKeyboardColor.NEGATIVE)
     keyboards.add_line()
     keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
@@ -49,7 +52,9 @@ def keyboard_points_up():
     keyboards.add_button('+лвк', color=VkKeyboardColor.POSITIVE)
     keyboards.add_button('+инт', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
-    keyboards.add_button('+защ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+фзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+мзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
     keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
     return keyboards
 
@@ -64,5 +69,5 @@ def keyboard_battle():
     keyboards = VkKeyboard(one_time=True)
     keyboards.add_button('Атака', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
-    keyboards.add_button('Сбежать', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Позвать друга', color=VkKeyboardColor.POSITIVE)
     return keyboards

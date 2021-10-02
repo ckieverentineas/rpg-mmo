@@ -16,7 +16,6 @@ def main():
                 res, sending = checking(ida, text)
                 #отправка ответа пользователю
                 if (sending == True):
-                    print("Sent...")
                     sent(vk, ida, idrand, res, text)
         except vk_api.VkApiError as error_msg:
             print(f'problem char --> {error_msg}')
