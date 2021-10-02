@@ -12,7 +12,8 @@ def keyboards(text):
         "+инт": keyboard_points_up,
         "+здр": keyboard_points_up,
         "сброс": keyboard_points_up,
-        "исследовать": keyboard_battle
+        "исследовать": keyboard_battle,
+        "атака": keyboard_battle
     }
     try:
         keyboards = config[text.lower()]()

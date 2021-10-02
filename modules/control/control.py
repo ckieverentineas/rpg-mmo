@@ -15,7 +15,8 @@ def checking(idvk, text):
         "+инт":set_player_intelligence,
         "+здр":set_player_health,
         "сброс": clear_player_points,
-        "исследовать": reseach
+        "исследовать": reseach,
+        "атака": player_attack_defence
     }
     try:
         text = text.lower()

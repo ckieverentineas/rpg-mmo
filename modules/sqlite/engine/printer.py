@@ -8,12 +8,12 @@ def print_profile(idvk):
     result = f' 📝Уровень:{profile[0]["lvl"]} \n'
     result += f' 📗Опыт:{profile[0]["xp"]} \n'
     result += f' 🎆Рунная пыль:{profile[0]["gold"]} \n\n'
+    result += f' ❤Здоровье:{profile[0]["health"]} \n'
     result += f' 🗡Атака:{profile[0]["attack"]} \n'
     result += f' 🛡Физ. защита:{profile[0]["defence"]} \n'
     result += f' 🔰Маг. защита:{profile[0]["defencemagic"]} \n'
     result += f' 🦶Ловкость:{profile[0]["dexterity"]} \n'
-    result += f' 🌀Интеллект:{profile[0]["intelligence"]} \n'
-    result += f' ❤Здоровье:{profile[0]["health"]} \n\n'
+    result += f' 🌀Интеллект:{profile[0]["intelligence"]} \n\n'
     result += f' 🌟Очки параметров:{profile[0]["points"]} \n\n'
     print(f'Print profile for {idvk}.')
     return str(result)

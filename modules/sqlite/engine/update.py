@@ -1,4 +1,5 @@
 from modules.sqlite.connect import con
+from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player
 from modules.sqlite.engine.select import *
 import datetime
 #Запросы на апдейт новых данных
@@ -163,4 +164,26 @@ def clear_player_points(idvk):
     update('player', 'points', points, idvk)
     status += f'Начислено {int(point)} очков параметров.'
     print(f'Return {int(point)} for rebalance avatar by {idvk}.')
+    return status
+
+def player_attack_defence(idvk):
+    #атака игрока
+    player = select('player_current', 'attack', idvk)
+    mob = select('mob_current','health, defence', idvk)
+    damage = player[0]["attack"] - mob[0]["defence"]
+    status = ""
+    if (damage > 0):
+        health = mob[0]["health"] - damage
+        status += f'\n\nВы нанесли {damage} урона.\n\n'
+        update('mob_current', 'health', health, idvk)
+        print(f'Mob was attacked and got {damage} damage by player {idvk}')
+    else:
+        status += f'\nВы не смогли пробить броню. Нанесено 0 урона\n'
+        print(f'Mob was attacked and not got damage by player {idvk}')
+    if (player[0]["attack"] > 1):
+        update('player_current', 'attack', player[0]["attack"]-1, idvk)
+    if (mob[0]["defence"] > 0 ):
+        update('mob_current', 'defence', mob[0]["defence"]-1, idvk)
+    status += print_battle_turn_mob(idvk)
+    status += print_battle_turn_player(idvk)
     return status
