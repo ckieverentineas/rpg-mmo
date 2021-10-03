@@ -5,6 +5,8 @@ def keyboards(text):
         "начать": keyboard_register,
         "профиль": keyboard_profile,
         "назад": keyboard_back,
+        "+ур": keyboard_back,
+        "-ур": keyboard_back,
         "+атк": keyboard_points_up,
         "+фзащ": keyboard_points_up,
         "+мзащ": keyboard_points_up,
@@ -64,11 +66,17 @@ def keyboard_back():
     keyboards.add_button('Профиль', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
+    keyboards.add_button('+ур', color=VkKeyboardColor.SECONDARY)
     return keyboards
 
 def keyboard_battle():
     keyboards = VkKeyboard(one_time=True)
     keyboards.add_button('Атака', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
-    keyboards.add_button('Позвать друга', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
+    keyboards.add_button('+ур', color=VkKeyboardColor.SECONDARY)
     return keyboards
