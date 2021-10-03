@@ -263,9 +263,7 @@ def player_turn_return(idvk):
     return False
 
 def battle_control(idvk):
-    costattack = select('setting', 'costattack', idvk)
-    playerdex = select('player_current', 'dexterity', idvk)
-    mobdex = select('mob_current', 'dexterity', idvk)
+    #контролер битвы
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
     status = ""
