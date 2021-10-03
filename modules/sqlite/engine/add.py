@@ -1,6 +1,6 @@
 import datetime
 from os import stat
-from random import randint, random
+import random
 from modules.sqlite.connect import con
 from modules.sqlite.engine.select import battle_dexterity_equal, be, select
 from modules.sqlite.engine.update import *
@@ -53,19 +53,19 @@ def generate_mob(idvk):
     dexterity = 0
     intelligence = 0
     health = 0
-    xp = 1 + randint(0,lvl) + randint(0,lvl)*random()
-    gold = 1 + randint(0,lvl) + randint(0,lvl)*random()
-    points = 5+lvl*2*lvl
+    xp = 1 + lvl+lvl*random.SystemRandom(attack).uniform(-0.30, 0.30)
+    gold = 1 + lvl+lvl*random.SystemRandom(attack).uniform(-0.30, 0.30)
+    points = 5+2*lvl
     crdate = datetime.datetime.now()
     while (points > 0):
         if(points > 0):
-            attack = attack + 2
+            health = health + 4
             points = points - 1
         if(points > 0):
             defence = defence + 3
             points = points - 1
         if(points > 0):
-            health = health + 4
+            attack = attack + 2
             points = points - 1
         if(points > 0):
             dexterity = dexterity + 2
@@ -74,14 +74,58 @@ def generate_mob(idvk):
             intelligence = intelligence + 2
             points = points - 1
         if(points > 0):
+            defence = defence + 3
+            points = points - 1
+        
+        if(points > 0):
             defencemagic = defencemagic + 3
             points = points - 1
-    attack = attack + randint(0,lvl)*random()
-    defence = defence + randint(0,lvl)*random()
-    defencemagic = defencemagic + randint(0,lvl)*random()
-    dexterity = dexterity + randint(0,lvl)*random()
-    intelligence = intelligence + randint(0,lvl)*random()
-    health = health + randint(0,lvl)*random()
+        if(points > 0):
+            health = health + 4
+            points = points - 1
+        if(points > 0):
+            dexterity = dexterity + 2
+            points = points - 1
+        if(points > 0):
+            attack = attack + 2
+            points = points - 1
+        if(points > 0):
+            defence = defence + 3
+            points = points - 1
+        if(points > 0):
+            intelligence = intelligence + 2
+            points = points - 1
+        
+        if(points > 0):
+            health = health + 4
+            points = points - 1
+        if(points > 0):
+            defence = defence + 3
+            points = points - 1
+        if(points > 0):
+            dexterity = dexterity + 2
+            points = points - 1
+        if(points > 0):
+            attack = attack + 2
+            points = points - 1
+        if(points > 0):
+            defencemagic = defencemagic + 3
+            points = points - 1
+        if(points > 0):
+            defence = defence + 3
+            points = points - 1
+        if(points > 0):
+            dexterity = dexterity + 2
+            points = points - 1
+        if(points > 0):
+            intelligence = intelligence + 2
+            points = points - 1
+    attack = attack + attack*random.SystemRandom(attack).uniform(-0.30, 0.30)
+    defence = defence + defence*random.SystemRandom(defence).uniform(-0.30, 0.30) 
+    defencemagic = defencemagic + defencemagic*random.SystemRandom(defencemagic).uniform(-0.30, 0.30)
+    dexterity = dexterity + dexterity*random.SystemRandom(dexterity).uniform(-0.30, 0.30)
+    intelligence = intelligence + intelligence*random.SystemRandom(intelligence).uniform(-0.30, 0.30)
+    health = health + health*random.SystemRandom(health).uniform(-0.30, 0.30)
     cursor = con()
     #Инициализация нового игрока
     sqlite_insert_with_param = """INSERT OR IGNORE INTO mob
@@ -89,8 +133,8 @@ def generate_mob(idvk):
                                 dexterity, intelligence,
                                 health, xp, gold, points, crdate)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-    data_tuple = (idvk, lvl, attack, defence, defencemagic,
-                  dexterity, intelligence, health, int(xp), int(gold),
+    data_tuple = (idvk, lvl, int(attack), int(defence), int(defencemagic),
+                  int(dexterity), int(intelligence), int(health), int(xp), int(gold),
                   points, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
@@ -122,8 +166,6 @@ def generate_battle(idvk):
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
-    costattack = battle_dexterity_equal(idvk)
-    update('setting', 'costattack', costattack, idvk)
     print(f'Generate PVE event for {idvk}')
 
 def generate_setting_for_player(idvk):
