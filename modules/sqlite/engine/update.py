@@ -207,6 +207,61 @@ def mob_attack_defence(idvk):
         update('player_current', 'defence', mob[0]["defence"]-1, idvk)
     return status
 
+def player_turn(idvk):
+    #Ход игрока
+    costattack = select('setting', 'costattack', idvk)
+    playerdex = select('player_current', 'dexterity', idvk)
+    status = ""
+    while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
+        print(f'Now turn player by {idvk}')
+        status = player_attack_defence(idvk)
+        update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
+        playerdex = select('player_current', 'dexterity', idvk)
+        return status
+    return status
+
+def mob_turn(idvk):
+    costattack = select('setting', 'costattack', idvk)
+    mobdex = select('mob_current', 'dexterity', idvk)
+    status = ""
+    while (mobdex[0]["dexterity"] >= costattack[0]["costattack"]):
+        print(f'Now turn mob for {idvk}')
+        status += mob_attack_defence(idvk)
+        update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
+        mobdex = select('mob_current', 'dexterity', idvk)
+    return status
+
+def battle_add_energy(idvk):
+    costattack = select('setting', 'costattack', idvk)
+    playerdex = select('player_current', 'dexterity', idvk)
+    mobdex = select('mob_current', 'dexterity', idvk)
+    player = select('player', 'dexterity', idvk)
+    mob = select('mob', 'dexterity', idvk)
+    status = ""
+    if (playerdex[0]["dexterity"] < costattack[0]["costattack"] and mobdex[0]["dexterity"] < costattack[0]["costattack"]):
+        print(f'End turn for player and mob by {idvk}')
+        playerdex = select('player_current', 'dexterity', idvk)
+        mobdex = select('mob_current', 'dexterity', idvk)
+        update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
+        update('mob_current', 'dexterity', mobdex[0]["dexterity"]+mob[0]["dexterity"], idvk)
+        status += f'\n\nВы восстановили {player[0]["dexterity"]} энергии\n'
+        status += f'Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
+        status += print_battle_turn_mob(idvk)
+        status += print_battle_turn_player(idvk)
+        return status
+    return status
+
+def player_turn_return(idvk):
+    costattack = select('setting', 'costattack', idvk)
+    playerdex = select('player_current', 'dexterity', idvk)
+    status = ""
+    if (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
+        #передача управления игроку
+        status += print_battle_turn_mob(idvk)
+        status += print_battle_turn_player(idvk)
+        return status
+    return False
+
 def battle_control(idvk):
     costattack = select('setting', 'costattack', idvk)
     playerdex = select('player_current', 'dexterity', idvk)
@@ -215,56 +270,22 @@ def battle_control(idvk):
     mob = select('mob', 'dexterity', idvk)
     status = ""
     if (player[0]["dexterity"] > mob[0]["dexterity"]):
-        while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
-            print(f'Now turn player by {idvk}')
-            status += player_attack_defence(idvk)
-            update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
-            playerdex = select('player_current', 'dexterity', idvk)
-            if (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
-                status += print_battle_turn_mob(idvk)
-                status += print_battle_turn_player(idvk)
-                return status
-        while (mobdex[0]["dexterity"] >= costattack[0]["costattack"]):
-            print(f'Now turn mob for {idvk}')
-            status += mob_attack_defence(idvk)
-            update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
-            mobdex = select('mob_current', 'dexterity', idvk)
-        if (playerdex[0]["dexterity"] < costattack[0]["costattack"] and mobdex[0]["dexterity"] < costattack[0]["costattack"]):
-            print(f'End turn for player and mob by {idvk}')
-            playerdex = select('player_current', 'dexterity', idvk)
-            mobdex = select('mob_current', 'dexterity', idvk)
-            update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
-            update('mob_current', 'dexterity', mobdex[0]["dexterity"]+mob[0]["dexterity"], idvk)
-            status += f'\n\nВы восстановили {player[0]["dexterity"]} энергии\n'
-            status += f'Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
-            status += print_battle_turn_mob(idvk)
-            status += print_battle_turn_player(idvk)
+        status += player_turn(idvk)
+        check = player_turn_return(idvk)
+        if (check != False):
+            status += check
+            return status
+        status += mob_turn(idvk)
+        status += battle_add_energy(idvk)
         return status
     else:
-        while (mobdex[0]["dexterity"] >= costattack[0]["costattack"]):
-            print(f'Now turn mob for {idvk}')
-            status += mob_attack_defence(idvk)
-            update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
-            mobdex = select('mob_current', 'dexterity', idvk)
-        while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
-            print(f'Now turn player by {idvk}')
-            status += player_attack_defence(idvk)
-            update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
-            playerdex = select('player_current', 'dexterity', idvk)
-            if (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
-                status += print_battle_turn_mob(idvk)
-                status += print_battle_turn_player(idvk)
-                return status
-        if (playerdex[0]["dexterity"] < costattack[0]["costattack"] and mobdex[0]["dexterity"] < costattack[0]["costattack"]):
-            print(f'End turn for player and mob by {idvk}')
-            playerdex = select('player_current', 'dexterity', idvk)
-            mobdex = select('mob_current', 'dexterity', idvk)
-            update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
-            update('mob_current', 'dexterity', mobdex[0]["dexterity"]+mob[0]["dexterity"], idvk)
-            status += f'\n\nВы восстановили {player[0]["dexterity"]} энергии\n'
-            status += f'Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
-            status += print_battle_turn_mob(idvk)
-            status += print_battle_turn_player(idvk)
+        status += mob_turn(idvk)
+        status += player_turn(idvk)
+        check = player_turn_return(idvk)
+        if (check != False):
+            status += check
+            return status
+        status += battle_add_energy(idvk)
         return status
 
             
