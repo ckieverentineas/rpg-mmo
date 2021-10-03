@@ -1,6 +1,9 @@
+from os import urandom
+import random
 from modules.sqlite.connect import con
 from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player
 from modules.sqlite.engine.select import *
+from modules.sqlite.engine.delete import *
 import datetime
 #Запросы на апдейт новых данных
 
@@ -132,33 +135,33 @@ def clear_player_points(idvk):
     stat = source[0]["attack"]
     point = point + stat/2
     update('player','attack', 0, idvk)
-    status += gen_status('Атака', stat)
+    status += gen_status('Атака', stat/2)
     # обнуляем физическую защиту
     stat = source[0]["defence"]
     point = point + stat/3
     update('player','defence', 0, idvk)
-    status += gen_status('Физическая защита', stat)
+    status += gen_status('Физическая защита', stat/3)
     # обнуляем защиту
     stat = source[0]["defencemagic"]
     point = point + stat/3
     update('player','defencemagic', 0, idvk)
-    status += gen_status('Магическая защита', stat)
+    status += gen_status('Магическая защита', stat/3)
     #обнуляем ловкость
     stat = source[0]["dexterity"]
     point = point + stat/2
     update('player','dexterity', 0, idvk)
-    status += gen_status('Ловкость', stat)
+    status += gen_status('Ловкость', stat/2)
     #обнуляем интеллект
     stat = source[0]["intelligence"]
     point = point + stat/2
     update('player','intelligence', 0, idvk)
-    status += gen_status('Интеллект', stat)
+    status += gen_status('Интеллект', stat/2)
     #обнуляем здоровье
     stat = source[0]["health"]
     if (stat > 0):
         point = point + stat/4
     update('player','health', 0, idvk)
-    status += gen_status('Здоровье', stat)
+    status += gen_status('Здоровье', stat/4)
     #начисляем очки
     points = points + int(point)
     update('player', 'points', points, idvk)
@@ -217,6 +220,10 @@ def player_turn(idvk):
         status = player_attack_defence(idvk)
         update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         playerdex = select('player_current', 'dexterity', idvk)
+        #проверка победы игрока
+        winner = player_win(idvk)
+        if (winner != False):
+            return status
         return status
     return status
 
@@ -229,6 +236,10 @@ def mob_turn(idvk):
         status += mob_attack_defence(idvk)
         update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         mobdex = select('mob_current', 'dexterity', idvk)
+        #проверка на смерть игрока
+        winner = player_dead(idvk)
+        if (winner != False):
+            return status
     return status
 
 def battle_add_energy(idvk):
@@ -262,29 +273,117 @@ def player_turn_return(idvk):
         return status
     return False
 
+def player_win(idvk):
+    mob = select('mob_current', 'health', idvk)
+    status = ""
+    if (mob[0]["health"] <= 0):
+        status += f'Вы прикончили моба, как карася'
+        status += player_lvl_up(idvk)
+        return status
+    return False
+
+def player_dead(idvk):
+    player = select('player_current', 'health', idvk)
+    status = ""
+    if (player[0]["health"] <= 0):
+        status += f'Вы умерли'
+        return status
+    return False
+    
 def battle_control(idvk):
     #контролер битвы
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
     status = ""
-    if (player[0]["dexterity"] > mob[0]["dexterity"]):
+    if (player[0]["dexterity"] >= mob[0]["dexterity"]):
+        #атака игрока с преобладающей ловкостью
         status += player_turn(idvk)
+        #проверка победы игрока
+        winner = player_win(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #проверка на передачу хода игроку
         check = player_turn_return(idvk)
         if (check != False):
             status += check
             return status
+        #атака моба
         status += mob_turn(idvk)
+        #проверка на смерть игрока
+        winner = player_dead(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #начисление энергии
         status += battle_add_energy(idvk)
         return status
     else:
+        #атака моба по игроку
         status += mob_turn(idvk)
+        #проверка на смерть игрока
+        winner = player_dead(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #атака игрока по мобу
         status += player_turn(idvk)
+        #проверка победы игрока
+        winner = player_win(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #проверка на передачу хода игроку
         check = player_turn_return(idvk)
         if (check != False):
             status += check
             return status
+        #Начисление энергии
         status += battle_add_energy(idvk)
         return status
 
-            
+def lvl_next(idvk):
+    #смена локации вверх
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl = lvlloc[0]["lvl"]
+    update('setting', 'lvl', lvl+1, idvk)
+    print(f'Level next on {lvl+1} for {idvk}')
+    status = f'Вы прошли вглубь в лес на {lvl+1} аршина'
+    return status
 
+def lvl_down(idvk):
+    #смена локации вниз
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl =lvlloc[0]["lvl"]
+    if (lvl >= 1):
+        update('setting', 'lvl', lvl-1, idvk)
+        print(f'Level down on {lvl} for {idvk}')
+        status = f'Вы пошли в сторону света на {lvl-1} аршина'
+        return status
+    status = f'Никто, асбсолютно никто там еще не был!'
+    return status
+
+def player_lvl_up(idvk):
+    player = select('player', 'xp, lvl, points, gold', idvk)
+    mob = select('mob', 'xp, gold', idvk)
+    lvl = player[0]["lvl"]
+    xp = player[0]["xp"]
+    xp = xp + mob[0]["xp"]
+    status = ""
+    if ((50+(10*lvl)*lvl) <= xp):
+        update('player', 'lvl', lvl+1, idvk)
+        status += f'\n\nВы достигли уровня {lvl+1}\n\n'
+        print(f'Level up on {lvl+1} for player {idvk}')
+        update('player', 'xp', xp - (50+(10*lvl)*lvl), idvk)
+        update('player', 'points', player[0]["points"]+1, idvk)
+        status += f'\n\nВы получили 1 очко навыков\n\n'
+        print(f'Got 1 point player {idvk}')
+        return status
+    update('player', 'xp', xp, idvk)
+    status += f'\n\nВы получили {mob[0]["xp"]} опыта\n\n'
+    print(f'From mob got {mob[0]["xp"]} xp for player {idvk}')
+    if (random.SystemRandom(100).randint(0,100) < 30):
+        update('player', 'gold', player[0]["gold"]+mob[0]["gold"], idvk)
+        status += f'Вы получили {mob[0]["gold"]} рунной пыли'
+        print(f'From mob got {mob[0]["gold"]} gold for player {idvk}')
+    return status
