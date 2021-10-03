@@ -387,3 +387,13 @@ def player_lvl_up(idvk):
         status += f'Вы получили {mob[0]["gold"]} рунной пыли'
         print(f'From mob got {mob[0]["gold"]} gold for player {idvk}')
     return status
+
+def reward(idvk):
+    reward = select('reward', 'xp', idvk)
+    player = select('player', 'xp', idvk)
+    rew = player[0]["xp"] + reward[0]["xp"]
+    update('player', 'xp', rew, idvk)
+    update('reward', 'xp', 0, idvk)
+    status = f'{idvk}, вам начислено {reward[0]["xp"]} опыта'
+    print(f'Sent {reward[0]["xp"]} xp for player {idvk}')
+    return status

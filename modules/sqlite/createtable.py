@@ -63,7 +63,7 @@ def createdb():
     cursor.commit()
     cursor.execute("""CREATE TABLE IF NOT EXISTS rune
     (id INTEGER PRIMARY KEY,
-    idvk INTEGER NOT NULL UNIQUE,
+    idvk INTEGER NOT NULL,
     attack INTEGER NOT NULL,
     defence INTEGER NOT NULL,
     defencemagic INTEGER NOT NULL,
@@ -73,6 +73,7 @@ def createdb():
     xp INTEGER NOT NULL,
     gold INTEGER NOT NULL,
     loot INTEGER NOT NULL,
+    equip INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()
@@ -81,6 +82,13 @@ def createdb():
     idvk INTEGER NOT NULL UNIQUE,
     lvl INTEGER NOT NULL,
     costattack INTEGER NOT NULL,
+    crdate datetime)
+    """)
+    cursor.commit()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS reward
+    (id INTEGER PRIMARY KEY,
+    idvk INTEGER NOT NULL UNIQUE,
+    xp INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()

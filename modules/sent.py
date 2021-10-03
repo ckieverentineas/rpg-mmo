@@ -8,15 +8,6 @@ def sent(vk, user_id, get_randid, mes, text):
     #запуск события печати
     vk.messages.setActivity(type='typing', peer_id = int(user_id))
     keyboard = keyboards(text)
-    if (player_win(user_id) or player_dead(user_id)):
-        keyboard = VkKeyboard(one_time=True)
-        keyboard.add_button('Профиль', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_line()
-        keyboard.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
-        keyboard.add_line()
-        keyboard.add_button('-ур', color=VkKeyboardColor.SECONDARY)
-        keyboard.add_button('+ур', color=VkKeyboardColor.SECONDARY)
-
     try:
         if (keyboard != False):
             vk.messages.send(

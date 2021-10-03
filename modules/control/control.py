@@ -18,7 +18,8 @@ def checking(idvk, text):
         "исследовать": reseach,
         "атака": battle_control,
         "+ур": lvl_next,
-        "-ур": lvl_down
+        "-ур": lvl_down,
+        "wipe": reward
     }
     try:
         text = text.lower()
