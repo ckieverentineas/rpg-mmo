@@ -90,6 +90,7 @@ def createdb():
     (id INTEGER PRIMARY KEY,
     idvk INTEGER NOT NULL UNIQUE,
     xp INTEGER NOT NULL,
+    gold INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()

@@ -20,8 +20,9 @@ def print_profile(idvk):
 
 def print_mob_profile(idvk):
     #вывод профиля мобв
+    mobname = f'Синий слизень'
     profile = select('mob', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
-    result = f'\n\nХарактеристика моба:\n'
+    result = f'\n\n{mobname}:\n'
     result += f' 📝Уровень:{profile[0]["lvl"]} \n'
     result += f' 📗Опыт:{profile[0]["xp"]} \n'
     result += f' 🎆Рунная пыль:{profile[0]["gold"]} \n\n'
@@ -58,9 +59,10 @@ def print_battle_turn_player(idvk):
 
 def print_battle_turn_mob(idvk):
     #конец хода моба
+    mobname = f'Синий слизень'
     player = select('mob', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     player_current = select('mob_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
-    status = f'\n\nМоб: Слизень\n'
+    status = f'\n\n{mobname}:\n'
     status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} 🛡{player_current[0]["defence"]}/{player[0]["defence"]} 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]}\n'
     status += f'❤{player_current[0]["health"]}/{player[0]["health"]}'
     status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]}'

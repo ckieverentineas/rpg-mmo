@@ -1,7 +1,7 @@
 from os import urandom
 import random
 from modules.sqlite.connect import con
-from modules.sqlite.engine.add import generate_rune
+from modules.sqlite.engine.add import generate_mob, generate_rune
 from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player, print_rune, print_rune_last_gen
 from modules.sqlite.engine.select import *
 from modules.sqlite.engine.delete import *
@@ -306,6 +306,13 @@ def player_dead(idvk):
     
 def battle_control(idvk):
     #контролер битвы
+    mobcheck = select('mob_current', 'health', idvk)
+    playercheck = select('player_current', 'health', idvk)
+    status = ""
+    if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
+        status += f'\n\nВы бьете воздух, как насчет исследовать дальше?\n'
+        status += f'P.s. жмите кнопку "Исследовать"\n\n'
+        return status
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
     status = ""
@@ -403,13 +410,17 @@ def player_lvl_up(idvk):
     return status
 
 def reward(idvk):
-    reward = select('reward', 'xp', idvk)
-    player = select('player', 'xp', idvk)
+    reward = select('reward', 'xp, gold', idvk)
+    player = select('player', 'xp, gold', idvk)
     rew = player[0]["xp"] + reward[0]["xp"]
     update('player', 'xp', rew, idvk)
     update('reward', 'xp', 0, idvk)
+    reg = player[0]["gold"] + reward[0]["gold"]
+    update('player', 'gold', reg, idvk)
+    update('reward', 'gold', 0, idvk)
     status = f'📗{idvk}, вам начислено {reward[0]["xp"]} опыта'
-    print(f'Sent {reward[0]["xp"]} xp for player {idvk}')
+    status += f'📗{idvk}, вам начислено {reward[0]["gold"]} рунной пыли'
+    print(f'Sent {reward[0]["xp"]} xp and {reward[0]["gold"]} for player {idvk}')
     return status
 
 def rune_equip(idvk):
@@ -560,7 +571,7 @@ def rune_delete(idvk):
 
 def use_runes_equip(idvk):
     runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
-    if (runes):
+    if (runes[0]["SUM(attack)"] != None):
         player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
         attack = player[0]["attack"] + runes[0]["SUM(attack)"]*2
         update('player_current', 'attack', attack, idvk)

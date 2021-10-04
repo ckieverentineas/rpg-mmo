@@ -190,14 +190,15 @@ def generate_setting_for_player(idvk):
 
 def generate_reward_for_player(idvk):
     #создание настроек персонажа
-    xp = 5000
+    xp = 7000
+    gold = 584
     crdate = datetime.datetime.now()
     cursor = con()
     #Инициализация нового игрока
     sqlite_insert_with_param = """INSERT OR IGNORE INTO reward
-                                (idvk, xp, crdate)
-                                VALUES (?, ?, ?);"""
-    data_tuple = (idvk, xp, crdate)
+                                (idvk, xp, gold, crdate)
+                                VALUES (?, ?, ?, ?);"""
+    data_tuple = (idvk, xp, gold, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
