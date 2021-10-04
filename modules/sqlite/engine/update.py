@@ -1,7 +1,8 @@
 from os import urandom
 import random
 from modules.sqlite.connect import con
-from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player
+from modules.sqlite.engine.add import generate_rune
+from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player, print_rune_last_gen
 from modules.sqlite.engine.select import *
 from modules.sqlite.engine.delete import *
 import datetime
@@ -279,6 +280,10 @@ def player_win(idvk):
     if (mob[0]["health"] <= 0):
         status += f'Вы прикончили моба, как карася'
         status += player_lvl_up(idvk)
+        genrune = random.SystemRandom(idvk).randint(0,1000)
+        if(genrune < 500):
+            generate_rune(idvk)
+            status += print_rune_last_gen(idvk)
         return status
     return False
 

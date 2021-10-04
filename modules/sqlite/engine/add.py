@@ -208,15 +208,15 @@ def generate_rune(idvk):
     #создание руны
     player = select('mob', 'lvl', idvk)
     lvl = player[0]["lvl"]
-    attack = ""
-    defence = ""
-    defencemagic = ""
-    dexterity = ""
-    intelligence = ""
-    health = ""
-    xp = ""
-    gold = ""
-    loot = ""
+    attack = 0
+    defence = 0
+    defencemagic = 0
+    dexterity = 0
+    intelligence = 0
+    health = 0
+    xp = 0
+    gold = 0
+    loot = 0
     equip = "no"
     crdate = datetime.datetime.now()
     points = 1
@@ -233,44 +233,44 @@ def generate_rune(idvk):
         points = 6
     while (points > 0):
         stat = random.SystemRandom(lvl).randint(0, 9)
-        if (stat == 0):
+        if (stat == 0 and attack == 0):
             attack = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 1):
+        if (stat == 1 and defence == 0):
             defence = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 2):
+        if (stat == 2 and defencemagic == 0):
             defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 3):
+        if (stat == 3 and dexterity == 0):
             dexterity = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 4):
+        if (stat == 4 and intelligence == 0):
             intelligence = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 5):
+        if (stat == 5 and health == 0):
             health = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 6):
+        if (stat == 6 and xp == 0):
             xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 7):
+        if (stat == 7 and gold  == 0):
             gold = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
-        if (stat == 8):
+        if (stat == 8 and loot == 0):
             loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
     
     cursor = con()
     #Инициализация новой руны
-    sqlite_insert_with_param = """INSERT OR IGNORE INTO player
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
                                 (idvk, attack, defence, defencemagic,
                                 dexterity, intelligence,
                                 health, xp, gold, loot, equip, crdate)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-    data_tuple = (idvk, attack, defence, defencemagic,
-                      dexterity, intelligence, health, xp, gold,
-                      loot, equip, crdate)
+    data_tuple = (idvk, int(attack), int(defence), int(defencemagic),
+                      int(dexterity), int(intelligence), int(health), int(xp), int(gold),
+                      int(loot), equip, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()

@@ -67,3 +67,28 @@ def print_battle_turn_mob(idvk):
     status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2}\n\n'
     print(f'Print battle panel about mob for {idvk}')
     return status
+
+def print_rune_last_gen(idvk):
+    #вывод руны
+    player = select('rune', 'id, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+    attack = player[-1]["attack"]
+    defence = player[-1]["defence"]
+    defencemagic = player[-1]["defencemagic"]
+    dexterity = player[-1]["dexterity"]
+    intelligence = player[-1]["intelligence"]
+    health = player[-1]["health"]
+    status = f'\n\nРуна {player[-1]["id"]}\n'
+    if (health != 0):
+        status += f'❤Здоровье:{health}'
+    if (attack != 0):
+        status += f'🗡Атака:{attack}'
+    if (defence != 0):
+        status += f'🛡Физ. защ:{defence}'
+    if (defencemagic != 0):
+        status += f'🔰Маг. защ:{defencemagic}'
+    if (dexterity != 0):
+        status += f'🦶Ловкость:{dexterity}'
+    if (intelligence != 0):
+        status += f'🌀Интеллект:{intelligence}'
+    print(f'Print generated rune for {idvk}')
+    return status
