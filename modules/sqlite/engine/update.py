@@ -289,9 +289,8 @@ def player_win(idvk):
     if (mob[0]["health"] <= 0):
         status += f'👊🏻Вы прикончили моба'
         status += player_lvl_up(idvk)
-        genrune = random.SystemRandom(idvk).randint(0,1000)
-        if(genrune < 500):
-            generate_rune(idvk)
+        genrune = generate_rune(idvk)
+        if (genrune != False):
             status += print_rune_last_gen(idvk)
         return status
     return False
@@ -311,7 +310,7 @@ def battle_control(idvk):
     status = ""
     if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
         status += f'\n\nВы бьете воздух, как насчет исследовать дальше?\n'
-        status += f'P.s. жмите кнопку "Исследовать"\n\n'
+        status += f'P.s. жмите кнопку "Исследовать".\n Иначе вам нужно распределить очки в здоровье через "Профиль"\n\n'
         return status
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
@@ -418,8 +417,8 @@ def reward(idvk):
     reg = player[0]["gold"] + reward[0]["gold"]
     update('player', 'gold', reg, idvk)
     update('reward', 'gold', 0, idvk)
-    status = f'📗{idvk}, вам начислено {reward[0]["xp"]} опыта'
-    status += f'📗{idvk}, вам начислено {reward[0]["gold"]} рунной пыли'
+    status = f'\n\n📗{idvk}, вам начислено {reward[0]["xp"]} опыта\n'
+    status += f'📗{idvk}, вам начислено {reward[0]["gold"]} рунной пыли\n\n'
     print(f'Sent {reward[0]["xp"]} xp and {reward[0]["gold"]} for player {idvk}')
     return status
 

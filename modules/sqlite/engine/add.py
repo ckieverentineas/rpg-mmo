@@ -221,38 +221,57 @@ def generate_rune(idvk):
     loot = 0
     equip = "no"
     crdate = datetime.datetime.now()
-    points = 1
-    ranger = random.SystemRandom(lvl).randint(0, 10000)
-    if (ranger < 100):
-        points = 2
-    if (ranger < 30):
-        points = 3
-    if (ranger < 14):
-        points = 4
-    if (ranger < 5):
-        points = 5
-    if (ranger < 1):
+    points = 0
+    status = f'\n\nВы получили руну:\n'
+    ranger = random.SystemRandom(lvl).randint(1, 10000)
+    if (ranger == 1):
         points = 6
+        status += f'\nРуна оказалась мифической\n'
+    if (ranger >= 2 and ranger <= 5):
+        points = 5
+        status += f'\nРуна оказалась легендарной\n'
+    if (ranger >= 6 and ranger <= 20):
+        points = 4
+        status += f'\nРуна оказалась эпической\n'
+    if (ranger >= 21 and ranger <= 65):
+        points = 3
+        status += f'\nРуна оказалась редкой\n'
+    if (ranger >= 66 and ranger <= 200):
+        points = 2
+        status += f'\nРуна оказалась необычной\n'
+    if (ranger >= 201 and ranger <= 500):
+        points = 1
+        status += f'\nРуна оказалась обычной\n'
+    if (points == 0):
+        status = ""
+        print(f'Rune destroy on generate part for player {idvk}')
+        return False
     while (points > 0):
-        stat = random.SystemRandom(lvl).randint(0, 5)
-        if (stat == 0 and attack == 0):
-            attack = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 1 and defence == 0):
-            defence = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 2 and defencemagic == 0):
-            defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 3 and dexterity == 0):
-            dexterity = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 4 and intelligence == 0):
-            intelligence = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 5 and health == 0):
-            health = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
+        stat = random.SystemRandom(lvl).randint(1, 6)
+        if (stat == 1 and attack == 0):
+            attack = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (attack != 0):
+                points = points - 1
+        if (stat == 2 and defence == 0):
+            defence = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (defence != 0):
+                points = points - 1
+        if (stat == 3 and defencemagic == 0):
+            defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (defencemagic != 0):
+                points = points - 1
+        if (stat == 4 and dexterity == 0):
+            dexterity = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (dexterity != 0):
+                points = points - 1
+        if (stat == 5 and intelligence == 0):
+            intelligence = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (intelligence != 0):
+                points = points - 1
+        if (stat == 6 and health == 0):
+            health = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (health != 0):
+                points = points - 1
         """
         if (stat == 6 and xp == 0):
             xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
@@ -278,3 +297,4 @@ def generate_rune(idvk):
     cursor.commit()
     cursor.close()
     print(f'Founding new rune for player {idvk}')
+    return status

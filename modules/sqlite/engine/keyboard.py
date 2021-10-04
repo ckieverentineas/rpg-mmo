@@ -22,6 +22,7 @@ def keyboards(text):
         "сломать": keyboard_rune,
         "+руна": keyboard_rune,
         "-руна": keyboard_rune,
+        "wipe": keyboard_profile
     }
     try:
         keyboards = config[text.lower()]()
