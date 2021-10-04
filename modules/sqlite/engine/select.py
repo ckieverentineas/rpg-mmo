@@ -8,6 +8,20 @@ def select(table, row, idvk):
     rows  = line.fetchall()
     return rows
     
+def select_item(table, row, idvk, itemid):
+    cursor = con()
+    cursor.row_factory = sqlite3.Row
+    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk} and id = {itemid}')
+    rows  = line.fetchall()
+    return rows
+
+def select_equip(table, row, idvk):
+    cursor = con()
+    cursor.row_factory = sqlite3.Row
+    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk} and equip = "yes"')
+    rows  = line.fetchall()
+    return rows
+
 def be(idvk):
     #проверка на наличие аккаунта
     info = select('player', 'id', idvk)

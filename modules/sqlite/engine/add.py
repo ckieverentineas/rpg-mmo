@@ -173,13 +173,14 @@ def generate_setting_for_player(idvk):
     #создание настроек персонажа
     lvl = 0
     costattack = 0
+    itemid = 0
     crdate = datetime.datetime.now()
     cursor = con()
     #Инициализация нового игрока
     sqlite_insert_with_param = """INSERT OR IGNORE INTO setting
-                                (idvk, lvl, costattack, crdate)
-                                VALUES (?, ?, ?, ?);"""
-    data_tuple = (idvk, lvl, costattack, crdate)
+                                (idvk, lvl, costattack, itemid, crdate)
+                                VALUES (?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, lvl, costattack, itemid, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
@@ -232,7 +233,7 @@ def generate_rune(idvk):
     if (ranger < 1):
         points = 6
     while (points > 0):
-        stat = random.SystemRandom(lvl).randint(0, 9)
+        stat = random.SystemRandom(lvl).randint(0, 5)
         if (stat == 0 and attack == 0):
             attack = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
@@ -251,6 +252,7 @@ def generate_rune(idvk):
         if (stat == 5 and health == 0):
             health = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
+        """
         if (stat == 6 and xp == 0):
             xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1
@@ -259,7 +261,7 @@ def generate_rune(idvk):
             points = points - 1
         if (stat == 8 and loot == 0):
             loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
+            points = points - 1"""
     
     cursor = con()
     #Инициализация новой руны

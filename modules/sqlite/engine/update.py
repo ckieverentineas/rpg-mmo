@@ -2,7 +2,7 @@ from os import urandom
 import random
 from modules.sqlite.connect import con
 from modules.sqlite.engine.add import generate_rune
-from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player, print_rune_last_gen
+from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player, print_rune, print_rune_last_gen
 from modules.sqlite.engine.select import *
 from modules.sqlite.engine.delete import *
 import datetime
@@ -12,6 +12,15 @@ def update(table, row, data, idvk):
     cursor = con()
     sql_update_query = (f'UPDATE {table} SET {row} = ? WHERE idvk = ?;')
     data_tuple = (data, idvk)
+    cursor.execute(sql_update_query, data_tuple)
+    cursor.commit()
+    cursor.commit()
+    cursor.close()
+
+def update_item(table, row, data, idvk, itemid):
+    cursor = con()
+    sql_update_query = (f'UPDATE {table} SET {row} = ? WHERE idvk = ? and id = ?;')
+    data_tuple = (data, idvk, itemid)
     cursor.execute(sql_update_query, data_tuple)
     cursor.commit()
     cursor.commit()
@@ -166,7 +175,7 @@ def clear_player_points(idvk):
     #начисляем очки
     points = points + int(point)
     update('player', 'points', points, idvk)
-    status += f'Начислено {int(point)} очков параметров.'
+    status += f'🌟Начислено {int(point)} очков параметров.'
     print(f'Return {int(point)} for rebalance avatar by {idvk}.')
     return status
 
@@ -178,11 +187,11 @@ def player_attack_defence(idvk):
     status = ""
     if (damage > 0):
         health = mob[0]["health"] - damage
-        status += f'\n\nВы нанесли {damage} урона.\n\n'
+        status += f'\n\n⚔Вы нанесли {damage} урона.\n\n'
         update('mob_current', 'health', health, idvk)
         print(f'Mob was attacked and got {damage} damage by player {idvk}')
     else:
-        status += f'\nВы не смогли пробить броню. Нанесено 0 урона\n'
+        status += f'\n⚒Вы не смогли пробить броню. Нанесено 0 урона\n'
         print(f'Mob was attacked and not got damage by player {idvk}')
     if (player[0]["attack"] > 1):
         update('player_current', 'attack', player[0]["attack"]-1, idvk)
@@ -199,11 +208,11 @@ def mob_attack_defence(idvk):
     status = ""
     if (damage > 0):
         health = mob[0]["health"] - damage
-        status += f'\n\nМоб нанес {damage} урона.\n\n'
+        status += f'\n\n⚔Моб нанес {damage} урона.\n\n'
         update('player_current', 'health', health, idvk)
         print(f'Mob doing attack and took {damage} damage for player {idvk}')
     else:
-        status += f'\nМоб не смог пробить броню. Нанесено 0 урона\n'
+        status += f'\n⚒Моб не смог пробить броню. Нанесено 0 урона\n'
         print(f'Mob doing attack and not took damage for player {idvk}')
     if (player[0]["attack"] > 1):
         update('mob_current', 'attack', player[0]["attack"]-1, idvk)
@@ -256,8 +265,8 @@ def battle_add_energy(idvk):
         mobdex = select('mob_current', 'dexterity', idvk)
         update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
         update('mob_current', 'dexterity', mobdex[0]["dexterity"]+mob[0]["dexterity"], idvk)
-        status += f'\n\nВы восстановили {player[0]["dexterity"]} энергии\n'
-        status += f'Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
+        status += f'\n\n⚡Вы восстановили {player[0]["dexterity"]} энергии\n'
+        status += f'⚡Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
         status += print_battle_turn_mob(idvk)
         status += print_battle_turn_player(idvk)
         return status
@@ -278,7 +287,7 @@ def player_win(idvk):
     mob = select('mob_current', 'health', idvk)
     status = ""
     if (mob[0]["health"] <= 0):
-        status += f'Вы прикончили моба, как карася'
+        status += f'👊🏻Вы прикончили моба'
         status += player_lvl_up(idvk)
         genrune = random.SystemRandom(idvk).randint(0,1000)
         if(genrune < 500):
@@ -291,7 +300,7 @@ def player_dead(idvk):
     player = select('player_current', 'health', idvk)
     status = ""
     if (player[0]["health"] <= 0):
-        status += f'Вы умерли'
+        status += f'☠Вы умерли'
         return status
     return False
     
@@ -353,7 +362,7 @@ def lvl_next(idvk):
     lvl = lvlloc[0]["lvl"]
     update('setting', 'lvl', lvl+1, idvk)
     print(f'Level next on {lvl+1} for {idvk}')
-    status = f'Вы прошли вглубь в лес на {lvl+1} аршина'
+    status = f'📝Вы прошли вглубь в лес на {lvl+1} аршина'
     return status
 
 def lvl_down(idvk):
@@ -363,7 +372,7 @@ def lvl_down(idvk):
     if (lvl >= 1):
         update('setting', 'lvl', lvl-1, idvk)
         print(f'Level down on {lvl} for {idvk}')
-        status = f'Вы пошли в сторону света на {lvl-1} аршина'
+        status = f'📝Вы пошли в сторону света на {lvl-1} аршина'
         return status
     status = f'Никто, асбсолютно никто там еще не был!'
     return status
@@ -377,19 +386,19 @@ def player_lvl_up(idvk):
     status = ""
     if ((50+(10*lvl)*lvl) <= xp):
         update('player', 'lvl', lvl+1, idvk)
-        status += f'\n\nВы достигли уровня {lvl+1}\n\n'
+        status += f'\n\n📝Вы достигли уровня {lvl+1}\n\n'
         print(f'Level up on {lvl+1} for player {idvk}')
         update('player', 'xp', xp - (50+(10*lvl)*lvl), idvk)
         update('player', 'points', player[0]["points"]+1, idvk)
-        status += f'\n\nВы получили 1 очко навыков\n\n'
+        status += f'\n\n🌟Вы получили 1 очко навыков\n\n'
         print(f'Got 1 point player {idvk}')
         return status
     update('player', 'xp', xp, idvk)
-    status += f'\n\nВы получили {mob[0]["xp"]} опыта\n\n'
+    status += f'\n\n📗Вы получили {mob[0]["xp"]} опыта\n\n'
     print(f'From mob got {mob[0]["xp"]} xp for player {idvk}')
     if (random.SystemRandom(100).randint(0,100) < 30):
         update('player', 'gold', player[0]["gold"]+mob[0]["gold"], idvk)
-        status += f'Вы получили {mob[0]["gold"]} рунной пыли'
+        status += f'🎆Вы получили {mob[0]["gold"]} рунной пыли'
         print(f'From mob got {mob[0]["gold"]} gold for player {idvk}')
     return status
 
@@ -399,6 +408,171 @@ def reward(idvk):
     rew = player[0]["xp"] + reward[0]["xp"]
     update('player', 'xp', rew, idvk)
     update('reward', 'xp', 0, idvk)
-    status = f'{idvk}, вам начислено {reward[0]["xp"]} опыта'
+    status = f'📗{idvk}, вам начислено {reward[0]["xp"]} опыта'
     print(f'Sent {reward[0]["xp"]} xp for player {idvk}')
     return status
+
+def rune_equip(idvk):
+    #надевание руны
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"]):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'equip', idvk, iditem)
+            if (check[0]["equip"] == "no"):
+                update_item('rune', 'equip', "yes", idvk, iditem)
+                status += f'\n\n🧿Руна {iditem} надета\n\n'
+                print(f'Rune {iditem} equip by player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} уже экипирована\n\n'
+                print(f'Rune {iditem} already equip by player {idvk}')
+                return status
+    except:
+        status += f'\n\nНе удалось надеть руну\n\n'
+        print(f'Can not equip rune for player {idvk}')
+        return status
+
+
+def rune_unequip(idvk):
+    #снятие руны
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"]):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'equip', idvk, iditem)
+            if (check[0]["equip"] == "yes"):
+                update_item('rune', 'equip', "no", idvk, iditem)
+                status += f'\n\n🧿Руна {iditem} снята\n\n'
+                print(f'Rune {iditem} unequip by player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не была экипирована\n\n'
+                print(f'Rune {iditem} already unequip by player {idvk}')
+                return status
+    except:
+        status += f'\n\nНе удалось снять руну\n\n'
+        print(f'Can not unequip rune for player {idvk}')
+        return status
+
+def rune_next(idvk):
+    #следующая руна
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]+1
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                update('setting', 'itemid', itemid, idvk)
+                status += f'\n\nСледующая руна:\n\n'
+                status += print_rune(idvk)
+                print(f'Rune {iditem} will next for player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nСледующая рунна не обнаружена, переход к первому предмету.\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found next rune for player {idvk}')
+        return status
+
+def rune_down(idvk):
+    #предыдущая руна
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]-1
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20 and itemid >= 0):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                update('setting', 'itemid', itemid, idvk)
+                status += f'\n\nПредыдущая руна:\n\n'
+                status += print_rune(idvk)
+                print(f'Rune {iditem} will down for player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} down not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему элементу предмету.\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found down rune for player {idvk}')
+        return status
+    count = select('rune', 'COUNT(id)', idvk)
+    status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему предмету.\n\n'
+    update('setting', 'itemid', count[0]["COUNT(id)"]-1, idvk)
+    status += print_rune(idvk)
+    print(f'Not found down rune for player {idvk}')
+    return status
+
+def rune_destroy(idvk):
+    #разпушение руны
+    player = select('player', 'lvl, gold', idvk)
+    gold = player[0]["gold"]
+    lvl = player[0]["lvl"]
+    will =  1 + lvl+lvl*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+    golds = gold + will
+    update('player', 'gold', golds, idvk)
+    status = f'\n\n🎆Вы получили {will} рунной пыли\n\n'
+    return status
+
+def rune_delete(idvk):
+    #распыление руны
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                check = delete_item('rune', idvk, iditem)
+                status += f'\n\nРуна {iditem} разрушена:\n\n'
+                status += rune_destroy(idvk)
+                print(f'Rune {iditem} was destroy for player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not destroy for player {idvk}')
+                return status
+    except:
+        status += f'\n\nРуна не обнаружена для распыления.\n\n'
+        print(f'Not found next rune for destroy by player {idvk}')
+        return status
+    return f'Руна не разрушена'
+
+def use_runes_equip(idvk):
+    runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
+    player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
+    attack = player[0]["attack"] + runes[0]["SUM(attack)"]*2
+    update('player_current', 'attack', attack, idvk)
+    defence = player[0]["defence"] + runes[0]["SUM(defence)"]*3
+    update('player_current', 'defence', defence, idvk)
+    defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]*3
+    update('player_current', 'defencemagic', defencemagic, idvk)
+    dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]*2
+    update('player_current', 'dexterity', dexterity, idvk)
+    intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]*2
+    update('player_current', 'intelligence', intelligence, idvk)
+    health = player[0]["health"] + runes[0]["SUM(health)"]*4
+    update('player_current', 'health', health, idvk)
+    mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]*4
+    update('player_current', 'mana', mana, idvk)
+    print(f'Runes activated for player {idvk}')

@@ -11,6 +11,7 @@ def reseach(idvk):
     delete('mob',idvk)
     generate_mob(idvk)
     generate_battle(idvk)
+    use_runes_equip(idvk)
     costattack = battle_dexterity_equal(idvk)
     update('setting', 'costattack', costattack, idvk)
     status = print_mob_profile(idvk)

@@ -82,6 +82,7 @@ def createdb():
     idvk INTEGER NOT NULL UNIQUE,
     lvl INTEGER NOT NULL,
     costattack INTEGER NOT NULL,
+    itemid INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()

@@ -37,7 +37,7 @@ def print_mob_profile(idvk):
 
 def back(idvk):
     #путь назад
-    status = f'Ничего не предвешало беды...'
+    status = f'Ничего не предвещало беды...'
     return str(status)
 
 def command_attack(idvk):
@@ -77,18 +77,53 @@ def print_rune_last_gen(idvk):
     dexterity = player[-1]["dexterity"]
     intelligence = player[-1]["intelligence"]
     health = player[-1]["health"]
-    status = f'\n\nРуна {player[-1]["id"]}\n'
+    status = f'\n\n🧿Руна {player[-1]["id"]}\n'
     if (health != 0):
-        status += f'❤Здоровье:{health}'
+        status += f'❤Здоровье: {health}\n'
     if (attack != 0):
-        status += f'🗡Атака:{attack}'
+        status += f'🗡Атака: {attack}\n'
     if (defence != 0):
-        status += f'🛡Физ. защ:{defence}'
+        status += f'🛡Физ. защ: {defence}\n'
     if (defencemagic != 0):
-        status += f'🔰Маг. защ:{defencemagic}'
+        status += f'🔰Маг. защ: {defencemagic}\n'
     if (dexterity != 0):
-        status += f'🦶Ловкость:{dexterity}'
+        status += f'🦶Ловкость: {dexterity}\n'
     if (intelligence != 0):
-        status += f'🌀Интеллект:{intelligence}'
+        status += f'🌀Интеллект: {intelligence}\n\n'
     print(f'Print generated rune for {idvk}')
     return status
+
+def print_rune(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"]):
+            iditem = rune[itemid]["id"]
+            player = select_item('rune', 'id, attack, defence, defencemagic, dexterity, intelligence, health', idvk, iditem)
+            attack = player[0]["attack"]
+            defence = player[0]["defence"]
+            defencemagic = player[0]["defencemagic"]
+            dexterity = player[0]["dexterity"]
+            intelligence = player[0]["intelligence"]
+            health = player[0]["health"]
+            status = f'\n\n🧿Руна {player[0]["id"]}\n'
+            if (health != 0):
+                status += f'❤Здоровье: {health}\n'
+            if (attack != 0):
+                status += f'🗡Атака: {attack}\n'
+            if (defence != 0):
+                status += f'🛡Физ. защ: {defence}\n'
+            if (defencemagic != 0):
+                status += f'🔰Маг. защ: {defencemagic}\n'
+            if (dexterity != 0):
+                status += f'🦶Ловкость: {dexterity}\n'
+            if (intelligence != 0):
+                status += f'🌀Интеллект: {intelligence}\n\n'
+            print(f'Print current rune for {idvk}')
+            return status
+    except:
+        status += f'У вас пока что нет рун'
+        print(f'Not found rune for player {idvk}')
+        return status

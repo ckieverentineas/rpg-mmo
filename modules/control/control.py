@@ -2,6 +2,7 @@ from modules.sqlite.engine.gen import reseach
 from modules.sqlite.engine.update import *
 from modules.sqlite.engine.add import register
 from modules.sqlite.engine.printer import *
+import re
 
 def checking(idvk, text):
     config = {
@@ -19,12 +20,18 @@ def checking(idvk, text):
         "атака": battle_control,
         "+ур": lvl_next,
         "-ур": lvl_down,
-        "wipe": reward
+        "wipe": reward,
+        "руна": print_rune,
+        "надеть": rune_equip,
+        "снять": rune_unequip,
+        "сломать": rune_delete,
+        "+руна": rune_next,
+        "-руна": rune_down,
     }
     try:
         text = text.lower()
         if (be(idvk) == True or text == "начать"):
-            status = config[text](idvk)
+            status = config[re.sub('\d', '', text)](idvk)
             return str(status), True
         else:
             status = f'Напишите: Начать\n Чтобы инициализировать аккаунт.'

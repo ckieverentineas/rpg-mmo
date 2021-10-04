@@ -15,7 +15,13 @@ def keyboards(text):
         "+здр": keyboard_points_up,
         "сброс": keyboard_points_up,
         "исследовать": keyboard_battle,
-        "атака": keyboard_battle
+        "атака": keyboard_battle,
+        "руна": keyboard_rune,
+        "надеть": keyboard_rune,
+        "снять": keyboard_rune,
+        "сломать": keyboard_rune,
+        "+руна": keyboard_rune,
+        "-руна": keyboard_rune,
     }
     try:
         keyboards = config[text.lower()]()
@@ -65,6 +71,8 @@ def keyboard_back():
     keyboards = VkKeyboard(one_time=True)
     keyboards.add_button('Профиль', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
+    keyboards.add_button('Руна', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
@@ -79,4 +87,19 @@ def keyboard_battle():
     keyboards.add_line()
     keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
     keyboards.add_button('+ур', color=VkKeyboardColor.SECONDARY)
+    keyboards.add_line()
+    keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
+    return keyboards
+
+def keyboard_rune():
+    keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('Надеть', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Снять', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('-Руна', color=VkKeyboardColor.PRIMARY)
+    keyboards.add_button('+Руна', color=VkKeyboardColor.PRIMARY)
+    keyboards.add_line()
+    keyboards.add_button('СЛОМАТЬ', color=VkKeyboardColor.NEGATIVE)
+    keyboards.add_line()
+    keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
     return keyboards
