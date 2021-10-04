@@ -243,7 +243,6 @@ def generate_rune(idvk):
         points = 1
         status += f'\nРуна оказалась обычной\n'
     if (points == 0):
-        status = ""
         print(f'Rune destroy on generate part for player {idvk}')
         return False
     while (points > 0):

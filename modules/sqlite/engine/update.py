@@ -231,7 +231,7 @@ def player_turn(idvk):
         update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         playerdex = select('player_current', 'dexterity', idvk)
         #проверка победы игрока
-        winner = player_win(idvk)
+        winner = player_win_bool(idvk)
         if (winner != False):
             return status
         return status
@@ -291,8 +291,15 @@ def player_win(idvk):
         status += player_lvl_up(idvk)
         genrune = generate_rune(idvk)
         if (genrune != False):
+            status += genrune
             status += print_rune_last_gen(idvk)
         return status
+    return False
+
+def player_win_bool(idvk):
+    mob = select('mob_current', 'health', idvk)
+    if (mob[0]["health"] <= 0):
+        return True
     return False
 
 def player_dead(idvk):
