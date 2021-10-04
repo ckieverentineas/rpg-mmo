@@ -560,19 +560,21 @@ def rune_delete(idvk):
 
 def use_runes_equip(idvk):
     runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
-    player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
-    attack = player[0]["attack"] + runes[0]["SUM(attack)"]*2
-    update('player_current', 'attack', attack, idvk)
-    defence = player[0]["defence"] + runes[0]["SUM(defence)"]*3
-    update('player_current', 'defence', defence, idvk)
-    defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]*3
-    update('player_current', 'defencemagic', defencemagic, idvk)
-    dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]*2
-    update('player_current', 'dexterity', dexterity, idvk)
-    intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]*2
-    update('player_current', 'intelligence', intelligence, idvk)
-    health = player[0]["health"] + runes[0]["SUM(health)"]*4
-    update('player_current', 'health', health, idvk)
-    mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]*4
-    update('player_current', 'mana', mana, idvk)
-    print(f'Runes activated for player {idvk}')
+    if (runes):
+        player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
+        attack = player[0]["attack"] + runes[0]["SUM(attack)"]*2
+        update('player_current', 'attack', attack, idvk)
+        defence = player[0]["defence"] + runes[0]["SUM(defence)"]*3
+        update('player_current', 'defence', defence, idvk)
+        defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]*3
+        update('player_current', 'defencemagic', defencemagic, idvk)
+        dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]*2
+        update('player_current', 'dexterity', dexterity, idvk)
+        intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]*2
+        update('player_current', 'intelligence', intelligence, idvk)
+        health = player[0]["health"] + runes[0]["SUM(health)"]*4
+        update('player_current', 'health', health, idvk)
+        mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]*4
+        update('player_current', 'mana', mana, idvk)
+        print(f'Runes activated for player {idvk}')
+    
