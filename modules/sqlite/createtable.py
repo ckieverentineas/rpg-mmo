@@ -95,4 +95,21 @@ def createdb():
     crdate datetime)
     """)
     cursor.commit()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS inventory
+    (id INTEGER PRIMARY KEY,
+    idvk INTEGER NOT NULL,
+    mythical INTEGER NOT NULL,
+    legendary INTEGER NOT NULL,
+    epic INTEGER NOT NULL,
+    rare INTEGER NOT NULL,
+    unusual INTEGER NOT NULL,
+    usual INTEGER NOT NULL,
+    water INTEGER NOT NULL,
+    runic INTEGER NOT NULL,
+    flower INTEGER NOT NULL,
+    potionlife INTEGER NOT NULL,
+    potionmana INTEGER NOT NULL,
+    crdate datetime)
+    """)
+    cursor.commit()
     cursor.close()

@@ -38,6 +38,7 @@ def register(idvk):
         status = f'\n\n Приветствую нового рунного мастера! \n\n'
         status += generate_setting_for_player(idvk)
         status += generate_reward_for_player(idvk)
+        status += generate_inventory_for_player(idvk)
         return status  
     print(f'Master not forrgot skills {idvk}.') 
     status = f'Рунные мастера не сдаются'
@@ -187,6 +188,33 @@ def generate_setting_for_player(idvk):
     print(f'Settings init for player: {idvk}')
     status = f'\n\n Параметры персонажа инициализированы \n\n'
     return status  
+
+def generate_inventory_for_player(idvk):
+    #создание инвентаря пользователя
+    mythical = 0
+    legendary = 0
+    epic = 0
+    rare = 0
+    unusual = 0
+    usual = 0
+    water = 0
+    runic = 0
+    flower = 0
+    potionlife = 0
+    potionmana = 0
+    crdate = datetime.datetime.now()
+    cursor = con()
+    #Инициализация инвентаря нового игрока
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO inventory
+                                (idvk, mythical, legendary, epic, rare, unusual, usual, water, runic, flower, potionlife, potionmana, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, mythical, legendary, epic, rare, unusual, usual, water, runic, flower, potionlife, potionmana, crdate)
+    cursor.execute(sqlite_insert_with_param, data_tuple)
+    cursor.commit()
+    cursor.close()
+    print(f'Inventory init for player: {idvk}')
+    status = f'\n\n Инвентарь персонажа инициализирован \n\n'
+    return status 
 
 def generate_reward_for_player(idvk):
     #создание настроек персонажа
