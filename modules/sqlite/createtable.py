@@ -97,7 +97,7 @@ def createdb():
     cursor.commit()
     cursor.execute("""CREATE TABLE IF NOT EXISTS inventory
     (id INTEGER PRIMARY KEY,
-    idvk INTEGER NOT NULL,
+    idvk INTEGER NOT NULL UNIQUE,
     mythical INTEGER NOT NULL,
     legendary INTEGER NOT NULL,
     epic INTEGER NOT NULL,

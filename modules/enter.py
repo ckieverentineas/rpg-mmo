@@ -8,11 +8,15 @@ import requests
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 
+from modules.control.control import checking
+from modules.sent import sent
+
 vk_session = vk_api.VkApi(token = config.token)
 vk = vk_session.get_api()
 longpoll = VkLongPoll(vk_session)
 
-def get_longpoll():
+async def get_longpoll():
+    print(f'Longpool')
     try:
         while True:
             try:
@@ -23,7 +27,10 @@ def get_longpoll():
                         user_id = event.user_id
                         random_id = get_random_id()
                         text = event.text
-                        return vk, user_id, random_id, text
+                        res, sending = await checking(user_id, text)
+                        #отправка ответа пользователю
+                        if (sending == True):
+                            await sent(vk, user_id, random_id, res, text)
             except requests.exceptions.RequestException as error_msg:
                 print(f'problem char --> {error_msg}') 
                 continue

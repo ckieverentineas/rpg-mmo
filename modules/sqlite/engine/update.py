@@ -1,7 +1,7 @@
 from os import urandom
 import random
 from modules.sqlite.connect import con
-from modules.sqlite.engine.add import generate_mob, generate_rune
+from modules.sqlite.engine import generate_rune
 from modules.sqlite.engine.printer import print_battle_turn_mob, print_battle_turn_player, print_rune, print_rune_last_gen
 from modules.sqlite.engine.select import *
 from modules.sqlite.engine.delete import *
@@ -540,15 +540,51 @@ def rune_down(idvk):
     print(f'Not found down rune for player {idvk}')
     return status
 
-def rune_destroy(idvk):
+def rune_destroy(idvk, iditem):
     #разпушение руны
-    player = select('player', 'lvl, gold', idvk)
-    gold = player[0]["gold"]
-    lvl = player[0]["lvl"]
-    will =  1 + lvl+lvl*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-    golds = gold + will
-    update('player', 'gold', golds, idvk)
-    status = f'\n\n🎆Вы получили {will} рунной пыли\n\n'
+    print(f'0')
+    rune = select_item('rune', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk, iditem)
+    attack = rune[0]["attack"]
+    defence = rune[0]["defence"]
+    defencemagic = rune[0]["defencemagic"]
+    dexterity = rune[0]["dexterity"]
+    intelligence = rune[0]["intelligence"]
+    health = rune[0]["health"]
+    points = 0
+    status = f'\n\nРуна {iditem} разрушена:\n'
+    if (attack != 0):
+        points = points + 1
+    if (defence != 0):
+        points = points + 1
+    if (defencemagic != 0):
+        points = points + 1
+    if (dexterity != 0):
+        points = points + 1
+    if (intelligence != 0):
+        points = points + 1
+    if (health != 0):
+        points = points + 1
+    if (points == 1):
+        target = f'usual'
+        status += f'\nВы получили обычный обломок\n'
+    if (points == 2):
+        target = f'unusual'
+        status += f'\nВы получили необычный обломок\n'
+    if (points == 3):
+        target = f'rare'
+        status += f'\nВы получили редкий обломок\n'
+    if (points == 4):
+        target = f'epic'
+        status += f'\nВы получили эпический обломок\n'
+    if (points == 5):
+        target = f'legendary'
+        status += f'\nВы получили легендарный обломок\n'
+    if (points == 6):
+        target = f'mythical'
+        status += f'\nВы получили мифический обломок\n'
+    destroy = select('inventory', target, idvk)
+    update('inventory', target, destroy[0][target]+1, idvk)
+    print(f'Rune {target} destroy for player {idvk}')
     return status
 
 def rune_delete(idvk):
@@ -558,13 +594,12 @@ def rune_delete(idvk):
     itemid = item[0]["itemid"]
     status = ""
     try:
-        if (rune[itemid]["id"] and itemid <= 20):
+        if (rune[itemid]["id"]):
             iditem = rune[itemid]["id"]
             check = select_item('rune', 'id', idvk, iditem)
             if (check[0]["id"] == iditem):
+                status += rune_destroy(idvk, iditem)
                 check = delete_item('rune', idvk, iditem)
-                status += f'\n\nРуна {iditem} разрушена:\n\n'
-                status += rune_destroy(idvk)
                 status += f'\nТекущая руна:\n'
                 status += print_rune(idvk)
                 print(f'Rune {iditem} was destroy for player {idvk}')
@@ -575,7 +610,7 @@ def rune_delete(idvk):
                 return status
     except:
         status += f'\n\nРуна не обнаружена для распыления.\n\n'
-        print(f'Not found next rune for destroy by player {idvk}')
+        print(f'Not found rune for destroy by player {idvk}')
         return status
     return f'Руна не разрушена'
 
@@ -583,19 +618,19 @@ def use_runes_equip(idvk):
     runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
     if (runes[0]["SUM(attack)"] != None):
         player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
-        attack = player[0]["attack"] + runes[0]["SUM(attack)"]*2
+        attack = player[0]["attack"] + runes[0]["SUM(attack)"]
         update('player_current', 'attack', attack, idvk)
-        defence = player[0]["defence"] + runes[0]["SUM(defence)"]*3
+        defence = player[0]["defence"] + runes[0]["SUM(defence)"]
         update('player_current', 'defence', defence, idvk)
-        defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]*3
+        defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]
         update('player_current', 'defencemagic', defencemagic, idvk)
-        dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]*2
+        dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]
         update('player_current', 'dexterity', dexterity, idvk)
-        intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]*2
+        intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]
         update('player_current', 'intelligence', intelligence, idvk)
-        health = player[0]["health"] + runes[0]["SUM(health)"]*4
+        health = player[0]["health"] + runes[0]["SUM(health)"]
         update('player_current', 'health', health, idvk)
-        mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]*4
+        mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]
         update('player_current', 'mana', mana, idvk)
         print(f'Runes activated for player {idvk}')
     

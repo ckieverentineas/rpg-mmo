@@ -4,7 +4,7 @@ from modules.sqlite.engine.add import register
 from modules.sqlite.engine.printer import *
 import re
 
-def checking(idvk, text):
+async def checking(idvk, text):
     config = {
         "профиль": print_profile,
         "начать": register,

@@ -1,4 +1,3 @@
-from modules.sqlite.engine.add import *
 from modules.sqlite.engine.select import *
 #Выводы данных из баз данных
 def print_profile(idvk):

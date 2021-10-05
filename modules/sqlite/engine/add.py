@@ -3,7 +3,6 @@ from os import stat
 import random
 from modules.sqlite.connect import con
 from modules.sqlite.engine.select import battle_dexterity_equal, be, select
-from modules.sqlite.engine.update import *
 
 def register(idvk):
     #создание персонажа

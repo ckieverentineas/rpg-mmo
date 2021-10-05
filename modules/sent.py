@@ -4,7 +4,7 @@ from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from modules.sqlite.engine import keyboards
 from modules.sqlite.engine.update import player_dead, player_win
 
-def sent(vk, user_id, get_randid, mes, text):
+async def sent(vk, user_id, get_randid, mes, text):
     #запуск события печати
     vk.messages.setActivity(type='typing', peer_id = int(user_id))
     keyboard = keyboards(text)
