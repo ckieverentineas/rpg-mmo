@@ -64,6 +64,7 @@ def createdb():
     cursor.execute("""CREATE TABLE IF NOT EXISTS rune
     (id INTEGER PRIMARY KEY,
     idvk INTEGER NOT NULL,
+    lvl INTEGER NOT NULL,
     attack INTEGER NOT NULL,
     defence INTEGER NOT NULL,
     defencemagic INTEGER NOT NULL,

@@ -289,10 +289,12 @@ def player_win(idvk):
     if (mob[0]["health"] <= 0):
         status += f'👊🏻Вы прикончили моба'
         status += player_lvl_up(idvk)
-        genrune = generate_rune(idvk)
-        if (genrune != False):
-            status += genrune
-            status += print_rune_last_gen(idvk)
+        moblvl = select('mob', 'lvl', idvk)
+        if (moblvl[0]["lvl"] > 0):
+            genrune = generate_rune(idvk)
+            if (genrune != False):
+                status += genrune
+                status += print_rune_last_gen(idvk)
         return status
     return False
 
@@ -563,6 +565,8 @@ def rune_delete(idvk):
                 check = delete_item('rune', idvk, iditem)
                 status += f'\n\nРуна {iditem} разрушена:\n\n'
                 status += rune_destroy(idvk)
+                status += f'\nТекущая руна:\n'
+                status += print_rune(idvk)
                 print(f'Rune {iditem} was destroy for player {idvk}')
                 return status
             else:

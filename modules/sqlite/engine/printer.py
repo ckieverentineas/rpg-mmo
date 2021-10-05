@@ -3,18 +3,45 @@ from modules.sqlite.engine.select import *
 #Выводы данных из баз данных
 def print_profile(idvk):
     #вывод профиля
-    profile = select('player', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
-    result = f'\n\nВаш персонаж:\n'
-    result = f' 📝Уровень: {profile[0]["lvl"]} \n'
-    result += f' 📗Опыт: {profile[0]["xp"]}/{(50+(10*profile[0]["lvl"])*profile[0]["lvl"])} \n'
-    result += f' 🎆Рунная пыль: {profile[0]["gold"]} \n\n'
-    result += f' ❤Здоровье: {profile[0]["health"]} \n'
-    result += f' 🗡Атака: {profile[0]["attack"]} \n'
-    result += f' 🛡Физ. защита: {profile[0]["defence"]} \n'
-    result += f' 🔰Маг. защита: {profile[0]["defencemagic"]} \n'
-    result += f' 🦶Ловкость: {profile[0]["dexterity"]} \n'
-    result += f' 🌀Интеллект: {profile[0]["intelligence"]} \n\n'
-    result += f' 🌟Очки параметров: {profile[0]["points"]} \n\n'
+    runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
+    if (runes[0]["SUM(attack)"] != None):
+        profile = select('player', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+        attack = runes[0]["SUM(attack)"]*2
+        defence = runes[0]["SUM(defence)"]*3
+        defencemagic = runes[0]["SUM(defencemagic)"]*3
+        dexterity = runes[0]["SUM(dexterity)"]*2
+        intelligence = runes[0]["SUM(intelligence)"]*2
+        health = runes[0]["SUM(health)"]*4
+        result = f'\n\nВаш персонаж:\n'
+        result = f' 📝Уровень: {profile[0]["lvl"]} \n'
+        result += f' 📗Опыт: {profile[0]["xp"]}/{(50+(10*profile[0]["lvl"])*profile[0]["lvl"])} \n'
+        result += f' 🎆Рунная пыль: {profile[0]["gold"]} \n\n'
+        result += f' Здоровье: \n'
+        result +=  f' ❤{profile[0]["health"] + health} ({profile[0]["health"]}🌟{health}🧿)  \n'
+        result += f' Атака: \n'
+        result +=  f' 🗡{profile[0]["attack"] + attack} ({profile[0]["attack"]}🌟{attack}🧿) \n'
+        result += f' Физ. защита: \n'
+        result +=  f' 🛡{profile[0]["defence"] + defence} ({profile[0]["defence"]}🌟{defence}🧿) \n'
+        result += f' Маг. защита: \n'
+        result +=  f' 🔰{profile[0]["defencemagic"] + defencemagic} ({profile[0]["defencemagic"]}🌟{defencemagic}🧿) \n'
+        result += f' Ловкость: \n'
+        result +=  f' 🦶{profile[0]["dexterity"] + dexterity} ({profile[0]["dexterity"]}🌟{dexterity}🧿) \n'
+        result += f' Интеллект: \n'
+        result +=  f' 🌀{profile[0]["intelligence"] + intelligence} ({profile[0]["intelligence"]}🌟{intelligence}🧿) \n\n'
+        result += f' 🌟Очки параметров: {profile[0]["points"]} \n\n'
+    else:
+        profile = select('player', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+        result = f'\n\nВаш персонаж:\n'
+        result = f' 📝Уровень: {profile[0]["lvl"]} \n'
+        result += f' 📗Опыт: {profile[0]["xp"]}/{(50+(10*profile[0]["lvl"])*profile[0]["lvl"])} \n'
+        result += f' 🎆Рунная пыль: {profile[0]["gold"]} \n\n'
+        result += f' ❤Здоровье: {profile[0]["health"]} \n'
+        result += f' 🗡Атака: {profile[0]["attack"]} \n'
+        result += f' 🛡Физ. защита: {profile[0]["defence"]} \n'
+        result += f' 🔰Маг. защита: {profile[0]["defencemagic"]} \n'
+        result += f' 🦶Ловкость: {profile[0]["dexterity"]} \n'
+        result += f' 🌀Интеллект: {profile[0]["intelligence"]} \n\n'
+        result += f' 🌟Очки параметров: {profile[0]["points"]} \n\n'
     print(f'Print profile for {idvk}.')
     return str(result)
 
@@ -130,6 +157,15 @@ def print_rune(idvk):
             print(f'Print current rune for {idvk}')
             return status
     except:
-        status += f'У вас пока что нет рун'
-        print(f'Not found rune for player {idvk}')
-        return status
+        check = select('rune', 'id', idvk)
+        try:
+            if (check[0]["id"] != None):
+                status += f'Нажмите +руна, чтобы перейти к первой руне.'
+                return status
+        except:
+            status += f'У вас пока что нет рун'
+            print(f'Not found rune for player {idvk}')
+            return status
+    status += f'У вас пока что нет рун'
+    print(f'Not found rune for player {idvk}')
+    return status

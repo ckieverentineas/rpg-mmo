@@ -285,11 +285,11 @@ def generate_rune(idvk):
     cursor = con()
     #Инициализация новой руны
     sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
-                                (idvk, attack, defence, defencemagic,
+                                (idvk, lvl, attack, defence, defencemagic,
                                 dexterity, intelligence,
                                 health, xp, gold, loot, equip, crdate)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-    data_tuple = (idvk, int(attack), int(defence), int(defencemagic),
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, lvl, int(attack), int(defence), int(defencemagic),
                       int(dexterity), int(intelligence), int(health), int(xp), int(gold),
                       int(loot), equip, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
