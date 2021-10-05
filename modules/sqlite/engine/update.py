@@ -227,7 +227,7 @@ def player_turn(idvk):
     status = ""
     while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
         print(f'Now turn player by {idvk}')
-        status = player_attack_defence(idvk)
+        status += player_attack_defence(idvk)
         update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         playerdex = select('player_current', 'dexterity', idvk)
         #проверка победы игрока

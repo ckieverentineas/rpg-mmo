@@ -50,10 +50,12 @@ def print_battle_turn_player(idvk):
     player = select('player', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     player_current = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
     status = f'\n\nВы:\n'
-    status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} 🛡{player_current[0]["defence"]}/{player[0]["defence"]} 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]}\n'
-    status += f'❤{player_current[0]["health"]}/{player[0]["health"]}'
-    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]}'
-    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2}\n\n'
+    status += f' ❤{player_current[0]["health"]}/{player[0]["health"]} '
+    status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]} '
+    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]} \n'
+    status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
+    status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
+    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
     print(f'Print battle panel about player for {idvk}')
     return status
 
@@ -63,10 +65,12 @@ def print_battle_turn_mob(idvk):
     player = select('mob', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     player_current = select('mob_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
     status = f'\n\n{mobname}:\n'
-    status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} 🛡{player_current[0]["defence"]}/{player[0]["defence"]} 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]}\n'
-    status += f'❤{player_current[0]["health"]}/{player[0]["health"]}'
-    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]}'
-    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2}\n\n'
+    status += f' ❤{player_current[0]["health"]}/{player[0]["health"]} '
+    status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]} '
+    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]} \n'
+    status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
+    status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
+    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
     print(f'Print battle panel about mob for {idvk}')
     return status
 
