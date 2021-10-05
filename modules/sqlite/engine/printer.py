@@ -5,16 +5,16 @@ def print_profile(idvk):
     #вывод профиля
     profile = select('player', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     result = f'\n\nВаш персонаж:\n'
-    result = f' 📝Уровень:{profile[0]["lvl"]} \n'
-    result += f' 📗Опыт:{profile[0]["xp"]} \n'
-    result += f' 🎆Рунная пыль:{profile[0]["gold"]} \n\n'
-    result += f' ❤Здоровье:{profile[0]["health"]} \n'
-    result += f' 🗡Атака:{profile[0]["attack"]} \n'
-    result += f' 🛡Физ. защита:{profile[0]["defence"]} \n'
-    result += f' 🔰Маг. защита:{profile[0]["defencemagic"]} \n'
-    result += f' 🦶Ловкость:{profile[0]["dexterity"]} \n'
-    result += f' 🌀Интеллект:{profile[0]["intelligence"]} \n\n'
-    result += f' 🌟Очки параметров:{profile[0]["points"]} \n\n'
+    result = f' 📝Уровень: {profile[0]["lvl"]} \n'
+    result += f' 📗Опыт: {profile[0]["xp"]}/{(50+(10*profile[0]["lvl"])*profile[0]["lvl"])} \n'
+    result += f' 🎆Рунная пыль: {profile[0]["gold"]} \n\n'
+    result += f' ❤Здоровье: {profile[0]["health"]} \n'
+    result += f' 🗡Атака: {profile[0]["attack"]} \n'
+    result += f' 🛡Физ. защита: {profile[0]["defence"]} \n'
+    result += f' 🔰Маг. защита: {profile[0]["defencemagic"]} \n'
+    result += f' 🦶Ловкость: {profile[0]["dexterity"]} \n'
+    result += f' 🌀Интеллект: {profile[0]["intelligence"]} \n\n'
+    result += f' 🌟Очки параметров: {profile[0]["points"]} \n\n'
     print(f'Print profile for {idvk}.')
     return str(result)
 
@@ -23,15 +23,15 @@ def print_mob_profile(idvk):
     mobname = f'Синий слизень'
     profile = select('mob', 'lvl, xp, gold, points, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     result = f'\n\n{mobname}:\n'
-    result += f' 📝Уровень:{profile[0]["lvl"]} \n'
-    result += f' 📗Опыт:{profile[0]["xp"]} \n'
-    result += f' 🎆Рунная пыль:{profile[0]["gold"]} \n\n'
-    result += f' ❤Здоровье:{profile[0]["health"]} \n'
-    result += f' 🗡Атака:{profile[0]["attack"]} \n'
-    result += f' 🛡Физ. защита:{profile[0]["defence"]} \n'
-    result += f' 🔰Маг. защита:{profile[0]["defencemagic"]} \n'
-    result += f' 🦶Ловкость:{profile[0]["dexterity"]} \n'
-    result += f' 🌀Интеллект:{profile[0]["intelligence"]} \n\n'
+    result += f' 📝Уровень: {profile[0]["lvl"]} \n'
+    result += f' 📗Опыт: {profile[0]["xp"]} \n'
+    result += f' 🎆Рунная пыль: {profile[0]["gold"]} \n\n'
+    result += f' ❤Здоровье: {profile[0]["health"]} \n'
+    result += f' 🗡Атака: {profile[0]["attack"]} \n'
+    result += f' 🛡Физ. защита: {profile[0]["defence"]} \n'
+    result += f' 🔰Маг. защита: {profile[0]["defencemagic"]} \n'
+    result += f' 🦶Ловкость: {profile[0]["dexterity"]} \n'
+    result += f' 🌀Интеллект: {profile[0]["intelligence"]} \n\n'
     #result += f' 🌟Очки параметров:{profile[0]["points"]} '
     print(f'Print mob for {idvk}.')
     return str(result)
