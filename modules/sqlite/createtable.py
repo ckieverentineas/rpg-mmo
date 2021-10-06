@@ -90,8 +90,15 @@ def createdb():
     cursor.execute("""CREATE TABLE IF NOT EXISTS reward
     (id INTEGER PRIMARY KEY,
     idvk INTEGER NOT NULL UNIQUE,
-    xp INTEGER NOT NULL,
+    lvl INTEGER NOT NULL,
     gold INTEGER NOT NULL,
+    points INTEGER NOT NULL,
+    mythical INTEGER NOT NULL,
+    legendary INTEGER NOT NULL,
+    epic INTEGER NOT NULL,
+    rare INTEGER NOT NULL,
+    unusual INTEGER NOT NULL,
+    usual INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()

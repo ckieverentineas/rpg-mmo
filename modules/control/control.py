@@ -1,7 +1,6 @@
-from modules.sqlite.engine.gen import reseach
-from modules.sqlite.engine.update import *
-from modules.sqlite.engine.add import creator, register
-from modules.sqlite.engine.printer import *
+from modules.sqlite.engine.addpull import *
+
+
 import re
 
 async def checking(idvk, text):
