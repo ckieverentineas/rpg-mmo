@@ -1,6 +1,6 @@
 from modules.sqlite.engine.gen import reseach
 from modules.sqlite.engine.update import *
-from modules.sqlite.engine.add import register
+from modules.sqlite.engine.add import creator, register
 from modules.sqlite.engine.printer import *
 import re
 
@@ -27,6 +27,10 @@ async def checking(idvk, text):
         "сломать": rune_delete,
         "+руна": rune_next,
         "-руна": rune_down,
+        "++руна": rune_next,
+        "--руна": rune_down,
+        "создать": creator,
+        "алтарь": altar
     }
     try:
         text = text.lower()

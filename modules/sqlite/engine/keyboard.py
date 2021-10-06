@@ -19,10 +19,14 @@ def keyboards(text):
         "руна": keyboard_rune,
         "надеть": keyboard_rune,
         "снять": keyboard_rune,
-        "сломать": keyboard_rune,
+        "сломать": keyboard_altar,
         "+руна": keyboard_rune,
         "-руна": keyboard_rune,
-        "wipe": keyboard_profile
+        "++руна": keyboard_altar,
+        "--руна": keyboard_altar,
+        "wipe": keyboard_profile,
+        "алтарь": keyboard_altar,
+        "создать": keyboard_altar
     }
     try:
         keyboards = config[text.lower()]()
@@ -74,6 +78,8 @@ def keyboard_back():
     keyboards.add_line()
     keyboards.add_button('Руна', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
+    keyboards.add_button('Алтарь', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
@@ -99,6 +105,16 @@ def keyboard_rune():
     keyboards.add_line()
     keyboards.add_button('-Руна', color=VkKeyboardColor.PRIMARY)
     keyboards.add_button('+Руна', color=VkKeyboardColor.PRIMARY)
+    keyboards.add_line()
+    keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
+    return keyboards
+
+def keyboard_altar():
+    keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('СОЗДАТЬ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('--Руна', color=VkKeyboardColor.PRIMARY)
+    keyboards.add_button('++Руна', color=VkKeyboardColor.PRIMARY)
     keyboards.add_line()
     keyboards.add_button('СЛОМАТЬ', color=VkKeyboardColor.NEGATIVE)
     keyboards.add_line()

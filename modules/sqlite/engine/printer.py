@@ -1,5 +1,8 @@
-from modules.sqlite.engine.select import *
+
 #Выводы данных из баз данных
+from modules.sqlite.engine.add import battle_dexterity_equal, select, select_equip
+
+
 def print_profile(idvk):
     #вывод профиля
     runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
@@ -65,6 +68,11 @@ def print_mob_profile(idvk):
 def back(idvk):
     #путь назад
     status = f'Ничего не предвещало беды...'
+    return str(status)
+
+def altar(idvk):
+    #путь назад
+    status = f'Возможно именно здесь была создана первая руна...'
     return str(status)
 
 def command_attack(idvk):

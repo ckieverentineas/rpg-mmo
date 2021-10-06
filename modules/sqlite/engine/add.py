@@ -324,3 +324,196 @@ def generate_rune(idvk):
     cursor.close()
     print(f'Founding new rune for player {idvk}')
     return status
+
+def creator(idvk):
+    #воссоздание руны
+    player = select('mob', 'lvl', idvk)
+    lvl = player[0]["lvl"]
+    inventory = select('inventory', 'mythical, legendary, epic, rare, unusual, usual', idvk)
+    mythical = inventory[0]["mythical"]
+    legendary = inventory[0]["legendary"]
+    epic = inventory[0]["epic"]
+    rare = inventory[0]["rare"]
+    unusual = inventory[0]["unusual"]
+    usual = inventory[0]["usual"]
+    attack = 0
+    defence = 0
+    defencemagic = 0
+    dexterity = 0
+    intelligence = 0
+    health = 0
+    xp = 0
+    gold = 0
+    loot = 0
+    equip = "no"
+    crdate = datetime.datetime.now()
+    points = 0
+    status = f'\n\nВы воссоздали руну:\n'
+    if (mythical >= 10):
+        target = f'mythical'
+        points = 6
+        statusr = f'\nРуна оказалась мифической\n'
+    if (legendary >= 10):
+        target = f'legendary'
+        points = 5
+        statusr = f'\nРуна оказалась легендарной\n'
+    if (epic >= 10):
+        target = f'epic'
+        points = 4
+        statusr = f'\nРуна оказалась эпической\n'
+    if (rare >= 10):
+        target = f'rare'
+        points = 3
+        statusr = f'\nРуна оказалась редкой\n'
+    if (unusual >= 10):
+        target = f'unusual'
+        points = 2
+        statusr = f'\nРуна оказалась необычной\n'
+    if (usual >= 0):
+        target = f'usual'
+        points = 1
+        statusr = f'\nРуна оказалась обычной\n'
+    if (points == 0):
+        status = f'\nНедостаточно обломков для создания руны\n'
+        print(f'Rune can not create for player {idvk}')
+        return status
+    status += statusr
+    use = select('inventory', target, idvk)
+    update('inventory', target, use[0][target]-10, idvk)
+    while (points > 0):
+        stat = random.SystemRandom(lvl).randint(1, 6)
+        if (stat == 1 and attack == 0):
+            attack = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (attack != 0):
+                points = points - 1
+        if (stat == 2 and defence == 0):
+            defence = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (defence != 0):
+                points = points - 1
+        if (stat == 3 and defencemagic == 0):
+            defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (defencemagic != 0):
+                points = points - 1
+        if (stat == 4 and dexterity == 0):
+            dexterity = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (dexterity != 0):
+                points = points - 1
+        if (stat == 5 and intelligence == 0):
+            intelligence = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (intelligence != 0):
+                points = points - 1
+        if (stat == 6 and health == 0):
+            health = random.SystemRandom(lvl).randint(-lvl, lvl)
+            if (health != 0):
+                points = points - 1
+        """
+        if (stat == 6 and xp == 0):
+            xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+            points = points - 1
+        if (stat == 7 and gold  == 0):
+            gold = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+            points = points - 1
+        if (stat == 8 and loot == 0):
+            loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+            points = points - 1"""
+    
+    cursor = con()
+    #Инициализация новой руны
+    sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
+                                (idvk, lvl, attack, defence, defencemagic,
+                                dexterity, intelligence,
+                                health, xp, gold, loot, equip, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, lvl, int(attack), int(defence), int(defencemagic),
+                      int(dexterity), int(intelligence), int(health), int(xp), int(gold),
+                      int(loot), equip, crdate)
+    cursor.execute(sqlite_insert_with_param, data_tuple)
+    cursor.commit()
+    cursor.close()
+    status += print_rune_last_gen(idvk)
+    print(f'Created new rune for player {idvk}')
+    return status
+
+
+def update(table, row, data, idvk):
+    cursor = con()
+    sql_update_query = (f'UPDATE {table} SET {row} = ? WHERE idvk = ?;')
+    data_tuple = (data, idvk)
+    cursor.execute(sql_update_query, data_tuple)
+    cursor.commit()
+    cursor.commit()
+    cursor.close()
+
+def update_item(table, row, data, idvk, itemid):
+    cursor = con()
+    sql_update_query = (f'UPDATE {table} SET {row} = ? WHERE idvk = ? and id = ?;')
+    data_tuple = (data, idvk, itemid)
+    cursor.execute(sql_update_query, data_tuple)
+    cursor.commit()
+    cursor.commit()
+    cursor.close()
+
+def delete(table, idvk):
+    #Функция удаления данных
+    cursor = con()
+    sql_delete_query = (f'DELETE from {table} WHERE idvk = {idvk}')
+    cursor.execute(sql_delete_query)
+    cursor.commit()
+    print(f'Deleted record {table} for {idvk}')
+    cursor.close()
+
+def delete_item(table, idvk, itemid):
+    cursor = con()
+    sql_delete_query = (f'DELETE from {table} WHERE idvk = {idvk} and id = {itemid}')
+    cursor.execute(sql_delete_query)
+    cursor.commit()
+    print(f'Deleted item {table} {itemid} for {idvk}')
+    cursor.close()
+
+def select(table, row, idvk):
+    cursor = con()
+    cursor.row_factory = sqlite3.Row
+    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk}')
+    rows  = line.fetchall()
+    return rows
+    
+def select_item(table, row, idvk, itemid):
+    cursor = con()
+    cursor.row_factory = sqlite3.Row
+    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk} and id = {itemid}')
+    rows  = line.fetchall()
+    return rows
+
+def select_equip(table, row, idvk):
+    cursor = con()
+    cursor.row_factory = sqlite3.Row
+    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk} and equip = "yes"')
+    rows  = line.fetchall()
+    return rows
+
+def be(idvk):
+    #проверка на наличие аккаунта
+    info = select('player', 'id', idvk)
+    if (not info):
+        return False
+    return True
+
+def battle_dexterity_equal(idvk):
+    player = select('player', 'dexterity', idvk)
+    mob = select('mob', 'dexterity', idvk)
+    if (player[0]["dexterity"] > mob[0]["dexterity"]):
+        return mob[0]["dexterity"]
+    else:
+        return player[0]["dexterity"]
+
+def reseach(idvk):
+    delete('mob_current',idvk)
+    delete('player_current',idvk)
+    delete('mob',idvk)
+    generate_mob(idvk)
+    generate_battle(idvk)
+    costattack = battle_dexterity_equal(idvk)
+    update('setting', 'costattack', costattack, idvk)
+    use_runes_equip(idvk)
+    status = print_mob_profile(idvk)
+    return status
