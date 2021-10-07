@@ -84,6 +84,7 @@ def createdb():
     lvl INTEGER NOT NULL,
     costattack INTEGER NOT NULL,
     itemid INTEGER NOT NULL,
+    lvlmobkilled INTEGER NOT NULL,
     crdate datetime)
     """)
     cursor.commit()

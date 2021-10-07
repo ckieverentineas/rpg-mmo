@@ -175,13 +175,14 @@ def generate_setting_for_player(idvk):
     lvl = 0
     costattack = 0
     itemid = 0
+    lvlmobkilled = 0
     crdate = datetime.datetime.now()
     cursor = con()
     #Инициализация нового игрока
     sqlite_insert_with_param = """INSERT OR IGNORE INTO setting
-                                (idvk, lvl, costattack, itemid, crdate)
-                                VALUES (?, ?, ?, ?, ?);"""
-    data_tuple = (idvk, lvl, costattack, itemid, crdate)
+                                (idvk, lvl, costattack, itemid, lvlmobkilled, crdate)
+                                VALUES (?, ?, ?, ?, ?, ?);"""
+    data_tuple = (idvk, lvl, costattack, itemid, lvlmobkilled, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
@@ -335,112 +336,110 @@ def generate_rune(idvk):
 
 def creator(idvk):
     #воссоздание руны
-    player = select('player', 'lvl', idvk)
-    lvl = player[0]["lvl"]
-    inventory = select('inventory', 'mythical, legendary, epic, rare, unusual, usual', idvk)
-    mythical = inventory[0]["mythical"]
-    legendary = inventory[0]["legendary"]
-    epic = inventory[0]["epic"]
-    rare = inventory[0]["rare"]
-    unusual = inventory[0]["unusual"]
-    usual = inventory[0]["usual"]
-    attack = 0
-    defence = 0
-    defencemagic = 0
-    dexterity = 0
-    intelligence = 0
-    health = 0
-    xp = 0
-    gold = 0
-    loot = 0
-    equip = "no"
-    crdate = datetime.datetime.now()
-    points = 0
-    status = f'\n\nВы воссоздали руну:\n'
-    if (mythical >= 10):
-        target = f'mythical'
-        points = 6
-        statusr = f'\nРуна оказалась мифической\n'
-    if (legendary >= 10):
-        target = f'legendary'
-        points = 5
-        statusr = f'\nРуна оказалась легендарной\n'
-    if (epic >= 10):
-        target = f'epic'
-        points = 4
-        statusr = f'\nРуна оказалась эпической\n'
-    if (rare >= 10):
-        target = f'rare'
-        points = 3
-        statusr = f'\nРуна оказалась редкой\n'
-    if (unusual >= 10):
-        target = f'unusual'
-        points = 2
-        statusr = f'\nРуна оказалась необычной\n'
-    if (usual >= 0):
-        target = f'usual'
-        points = 1
-        statusr = f'\nРуна оказалась обычной\n'
-    if (points == 0):
-        status = f'\nНедостаточно обломков для создания руны\n'
-        print(f'Rune can not create for player {idvk}')
+    try:
+        player = select('setting', 'lvlmobkilled', idvk)
+        lvl = player[0]["lvlmobkilled"]
+        inventory = select('inventory', 'legendary, epic, rare, unusual, usual', idvk)
+        legendary = inventory[0]["legendary"]
+        epic = inventory[0]["epic"]
+        rare = inventory[0]["rare"]
+        unusual = inventory[0]["unusual"]
+        usual = inventory[0]["usual"]
+        attack = 0
+        defence = 0
+        defencemagic = 0
+        dexterity = 0
+        intelligence = 0
+        health = 0
+        xp = 0
+        gold = 0
+        loot = 0
+        equip = "no"
+        crdate = datetime.datetime.now()
+        points = 0
+        status = f'\n\nВы воссоздали руну:\n'
+        if (legendary >= 10):
+            target = f'legendary'
+            points = 6
+            statusr = f'\nВы создали мифическую руну\n'
+        if (epic >= 10):
+            target = f'epic'
+            points = 5
+            statusr = f'\nВы создали легендарную руну\n'
+        if (rare >= 10):
+            target = f'rare'
+            points = 4
+            statusr = f'\nВы создали эпическую руну\n'
+        if (unusual >= 10):
+            target = f'unusual'
+            points = 3
+            statusr = f'\nВы создали редкую руну\n'
+        if (usual >= 0):
+            target = f'usual'
+            points = 2
+            statusr = f'\nВы создали необычную руну\n'
+        if (points == 0):
+            status = f'\nНедостаточно обломков для создания руны\n'
+            print(f'Rune can not create for player {idvk}')
+            return status
+        status += statusr
+        use = select('inventory', target, idvk)
+        update('inventory', target, use[0][target]-10, idvk)
+        while (points > 0):
+            stat = random.SystemRandom(lvl).randint(1, 6)
+            if (stat == 1 and attack == 0):
+                attack = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (attack != 0):
+                    points = points - 1
+            if (stat == 2 and defence == 0):
+                defence = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (defence != 0):
+                    points = points - 1
+            if (stat == 3 and defencemagic == 0):
+                defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (defencemagic != 0):
+                    points = points - 1
+            if (stat == 4 and dexterity == 0):
+                dexterity = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (dexterity != 0):
+                    points = points - 1
+            if (stat == 5 and intelligence == 0):
+                intelligence = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (intelligence != 0):
+                    points = points - 1
+            if (stat == 6 and health == 0):
+                health = random.SystemRandom(lvl).randint(-lvl, lvl)
+                if (health != 0):
+                    points = points - 1
+            """
+            if (stat == 6 and xp == 0):
+                xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+                points = points - 1
+            if (stat == 7 and gold  == 0):
+                gold = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+                points = points - 1
+            if (stat == 8 and loot == 0):
+                loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
+                points = points - 1"""
+        
+        cursor = con()
+        #Инициализация новой руны
+        sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
+                                    (idvk, lvl, attack, defence, defencemagic,
+                                    dexterity, intelligence,
+                                    health, xp, gold, loot, equip, crdate)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+        data_tuple = (idvk, lvl, int(attack), int(defence), int(defencemagic),
+                        int(dexterity), int(intelligence), int(health), int(xp), int(gold),
+                        int(loot), equip, crdate)
+        cursor.execute(sqlite_insert_with_param, data_tuple)
+        cursor.commit()
+        cursor.close()
+        status += print_rune_last_gen(idvk)
+        print(f'Created new rune for player {idvk}')
         return status
-    status += statusr
-    use = select('inventory', target, idvk)
-    update('inventory', target, use[0][target]-10, idvk)
-    while (points > 0):
-        stat = random.SystemRandom(lvl).randint(1, 6)
-        if (stat == 1 and attack == 0):
-            attack = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (attack != 0):
-                points = points - 1
-        if (stat == 2 and defence == 0):
-            defence = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (defence != 0):
-                points = points - 1
-        if (stat == 3 and defencemagic == 0):
-            defencemagic = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (defencemagic != 0):
-                points = points - 1
-        if (stat == 4 and dexterity == 0):
-            dexterity = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (dexterity != 0):
-                points = points - 1
-        if (stat == 5 and intelligence == 0):
-            intelligence = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (intelligence != 0):
-                points = points - 1
-        if (stat == 6 and health == 0):
-            health = random.SystemRandom(lvl).randint(-lvl, lvl)
-            if (health != 0):
-                points = points - 1
-        """
-        if (stat == 6 and xp == 0):
-            xp = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 7 and gold  == 0):
-            gold = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1
-        if (stat == 8 and loot == 0):
-            loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
-            points = points - 1"""
-    
-    cursor = con()
-    #Инициализация новой руны
-    sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
-                                (idvk, lvl, attack, defence, defencemagic,
-                                dexterity, intelligence,
-                                health, xp, gold, loot, equip, crdate)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-    data_tuple = (idvk, lvl, int(attack), int(defence), int(defencemagic),
-                      int(dexterity), int(intelligence), int(health), int(xp), int(gold),
-                      int(loot), equip, crdate)
-    cursor.execute(sqlite_insert_with_param, data_tuple)
-    cursor.commit()
-    cursor.close()
-    status += print_rune_last_gen(idvk)
-    print(f'Created new rune for player {idvk}')
-    return status
+    except:
+        return f'Недостаточный уровень максимально убитого моба для создания рун!'
 
 def update(table, row, data, idvk):
     cursor = con()
@@ -717,6 +716,13 @@ def player_turn_return(idvk):
         return status
     return False
 
+def player_max_lvl_killed(idvk):
+    maxlvl = select('setting', 'lvlmobkilled', idvk)
+    mob = select('mob', 'lvl', idvk)
+    if (maxlvl[0]["lvlmobkilled"] < mob[0]["lvl"]):
+        update('setting', 'lvlmobkilled', mob[0]["lvl"], idvk)
+        print(f'Reach new max lvl {mob[0]["lvl"]} from killing mobs {idvk}')
+
 def player_win(idvk):
     mob = select('mob_current', 'health', idvk)
     status = ""
@@ -725,6 +731,7 @@ def player_win(idvk):
         status += player_lvl_up(idvk)
         moblvl = select('mob', 'lvl', idvk)
         if (moblvl[0]["lvl"] > 0):
+            player_max_lvl_killed(idvk)
             genrune = generate_rune(idvk)
             if (genrune != False):
                 status += genrune
@@ -854,36 +861,44 @@ def player_lvl_up(idvk):
 def reward(idvk):
     #inventory = select('reward', 'lvl, points, gold', idvk)
     inventory = select('reward', 'lvl, points, gold, mythical, legendary, epic, rare, unusual, usual', idvk)
-    mythical = inventory[0]["mythical"]
+    runes = select('inventory', 'mythical, legendary, epic, rare, unusual, usual', idvk)
+    mythical = runes[0]["mythical"] + inventory[0]["mythical"]
+    status = f'\nНачислено {inventory[0]["mythical"]} мифических обломков\n'
     update('inventory', 'mythical', mythical, idvk)
     update('reward', 'mythical', 0, idvk)
-    legendary = inventory[0]["legendary"]
+    legendary = runes[0]["legendary"] + inventory[0]["legendary"]
+    status += f'\nНачислено {inventory[0]["legendary"]} легендарных обломков\n'
     update('inventory', 'legendary', legendary, idvk)
     update('reward', 'legendary', 0, idvk)
-    epic = inventory[0]["epic"]
+    epic = runes[0]["epic"] + inventory[0]["epic"]
+    status += f'\nНачислено {inventory[0]["epic"]} эпических обломков\n'
     update('inventory', 'epic', epic, idvk)
     update('reward', 'epic', 0, idvk)
-    rare = inventory[0]["rare"]
+    rare = runes[0]["rare"] + inventory[0]["rare"]
+    status += f'\nНачислено {inventory[0]["rare"]} редких обломков\n'
     update('inventory', 'rare', rare, idvk)
     update('reward', 'rare', 0, idvk)
-    unusual = inventory[0]["unusual"]
+    unusual = runes[0]["unusual"] + inventory[0]["unusual"]
+    status += f'\nНачислено {inventory[0]["rare"]} необычных обломков\n'
     update('inventory', 'unusual', unusual, idvk)
     update('reward', 'unusual', 0, idvk)
-    usual = inventory[0]["usual"]
+    usual = runes[0]["usual"] + inventory[0]["usual"]
+    status += f'\nНачислено {inventory[0]["usual"]} обычных обломков\n'
     update('inventory', 'usual', usual, idvk)
     update('reward', 'usual', 0, idvk)
     player = select('player', 'lvl, points, gold', idvk)
     rew = player[0]["lvl"] + inventory[0]["lvl"]
+    status += f'\nВаш уровень увеличен на {inventory[0]["lvl"]}\n'
     update('player', 'lvl', rew, idvk)
     update('reward', 'lvl', 0, idvk)
     reg = player[0]["gold"] + inventory[0]["gold"]
+    status += f'\nРунная пыль начислена в количестве {inventory[0]["gold"]}\n'
     update('player', 'gold', reg, idvk)
     update('reward', 'gold', 0, idvk)
     rep = player[0]["points"] + inventory[0]["points"]
+    status += f'\nОчки характеристик восстановлены до {inventory[0]["points"]} очков\n'
     update('player', 'points', rep, idvk)
     update('reward', 'points', 0, idvk)
-    status = f'\n\n📗{idvk}, вам начислено {inventory[0]["points"]} опыта\n'
-    status += f'📗{idvk}, вам начислено {inventory[0]["gold"]} рунной пыли\n\n'
     print(f'Sent {inventory[0]["points"]} xp and {inventory[0]["gold"]} for player {idvk}')
     return status
 
@@ -998,7 +1013,6 @@ def rune_down(idvk):
 
 def rune_destroy(idvk, iditem):
     #разпушение руны
-    print(f'0')
     rune = select_item('rune', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk, iditem)
     attack = rune[0]["attack"]
     defence = rune[0]["defence"]
@@ -1057,6 +1071,7 @@ def rune_delete(idvk):
                 status += rune_destroy(idvk, iditem)
                 check = delete_item('rune', idvk, iditem)
                 status += f'\nТекущая руна:\n'
+                update('setting', 'itemid', 0, idvk)
                 status += print_rune(idvk)
                 print(f'Rune {iditem} was destroy for player {idvk}')
                 return status
@@ -1226,7 +1241,7 @@ def print_battle_turn_mob(idvk):
 
 def print_rune_last_gen(idvk):
     #вывод руны
-    player = select('rune', 'id, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
+    player = select('rune', 'id, lvl, attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     attack = player[-1]["attack"]
     defence = player[-1]["defence"]
     defencemagic = player[-1]["defencemagic"]
@@ -1234,6 +1249,7 @@ def print_rune_last_gen(idvk):
     intelligence = player[-1]["intelligence"]
     health = player[-1]["health"]
     status = f'\n\n🧿Руна {player[-1]["id"]}\n'
+    status += f'📝Уровень: {player[0]["lvl"]} \n'
     if (health != 0):
         status += f'❤Здоровье: {health}\n'
     if (attack != 0):
@@ -1257,7 +1273,7 @@ def print_rune(idvk):
     try:
         if (rune[itemid]["id"]):
             iditem = rune[itemid]["id"]
-            player = select_item('rune', 'id, attack, defence, defencemagic, dexterity, intelligence, health', idvk, iditem)
+            player = select_item('rune', 'id, lvl, attack, defence, defencemagic, dexterity, intelligence, health', idvk, iditem)
             attack = player[0]["attack"]
             defence = player[0]["defence"]
             defencemagic = player[0]["defencemagic"]
@@ -1265,6 +1281,7 @@ def print_rune(idvk):
             intelligence = player[0]["intelligence"]
             health = player[0]["health"]
             status = f'\n\n🧿Руна {player[0]["id"]}\n'
+            status += f'📝Уровень: {player[0]["lvl"]} \n'
             if (health != 0):
                 status += f'❤Здоровье: {health}\n'
             if (attack != 0):
