@@ -1071,8 +1071,9 @@ def rune_delete(idvk):
                 status += rune_destroy(idvk, iditem)
                 check = delete_item('rune', idvk, iditem)
                 status += f'\nТекущая руна:\n'
-                update('setting', 'itemid', 0, idvk)
-                status += print_rune(idvk)
+                #update('setting', 'itemid', iditem, idvk)
+                #status += print_rune(idvk)
+                status += rune_down(idvk)
                 print(f'Rune {iditem} was destroy for player {idvk}')
                 return status
             else:
