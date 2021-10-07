@@ -436,6 +436,7 @@ def creator(idvk):
         cursor.commit()
         cursor.close()
         status += print_rune_last_gen(idvk)
+        status += rune_down(idvk)
         print(f'Created new rune for player {idvk}')
         return status
     except:
@@ -696,9 +697,16 @@ def battle_add_energy(idvk):
         print(f'End turn for player and mob by {idvk}')
         playerdex = select('player_current', 'dexterity', idvk)
         mobdex = select('mob_current', 'dexterity', idvk)
-        update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
+        runes = select_equip('rune', 'SUM(dexterity)', idvk)
+        if (runes[0]["SUM(dexterity)"] != None):
+            update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"]+runes[0]["SUM(dexterity)"], idvk)
+        else:
+            update('player_current', 'dexterity', playerdex[0]["dexterity"]+player[0]["dexterity"], idvk)
         update('mob_current', 'dexterity', mobdex[0]["dexterity"]+mob[0]["dexterity"], idvk)
-        status += f'\n\n⚡Вы восстановили {player[0]["dexterity"]} энергии\n'
+        if (runes[0]["SUM(dexterity)"] != None):
+            status += f'\n\n⚡Вы восстановили {player[0]["dexterity"]+runes[0]["SUM(dexterity)"]} энергии\n'
+        else:
+            status += f'\n\n⚡Вы восстановили {player[0]["dexterity"]} энергии\n'
         status += f'⚡Моб восстановил {mob[0]["dexterity"]} энергии\n\n'
         status += print_battle_turn_mob(idvk)
         status += print_battle_turn_player(idvk)
@@ -760,12 +768,16 @@ def battle_control(idvk):
     status = ""
     if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
         status += f'\n\nВы бьете воздух, как насчет исследовать дальше?\n'
-        status += f'P.s. жмите кнопку "Исследовать".\n Иначе вам нужно распределить очки в здоровье через "Профиль"\n\n'
+        status += f'P.s. жмите кнопку "Исследовать" или повысьте здоровье\n'
         return status
     player = select('player', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
+    runes = select_equip('rune', 'SUM(dexterity)', idvk)
+    dex = player[0]["dexterity"]
+    if (runes[0]["SUM(dexterity)"] != None):
+        dex = dex + runes[0]["SUM(dexterity)"]
     status = ""
-    if (player[0]["dexterity"] >= mob[0]["dexterity"]):
+    if (dex >= mob[0]["dexterity"]):
         #атака игрока с преобладающей ловкостью
         status += player_turn(idvk)
         #проверка победы игрока
