@@ -1227,13 +1227,24 @@ def print_battle_turn_player(idvk):
     #конец хода игрока
     player = select('player', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     player_current = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
-    status = f'\n\nВы:\n'
-    status += f' ❤{player_current[0]["health"]}/{player[0]["health"]} '
-    status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]} '
-    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]} \n'
-    status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
-    status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
-    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
+    runes = select_equip('rune', 'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)', idvk)
+    costattack = select('setting', 'costattack', idvk)
+    if (runes[0]["SUM(attack)"] != None):
+        status = f'\n\nВы:\n'
+        status += f' ❤{player_current[0]["health"]}/{player[0]["health"]+runes[0]["SUM(health)"]} '
+        status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]+runes[0]["SUM(defence)"]} '
+        status += f'⚡{player_current[0]["dexterity"]}/{costattack[0]["costattack"]} \n'
+        status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]+runes[0]["SUM(attack)"]} ' 
+        status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]+runes[0]["SUM(defencemagic)"]} '
+        status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*4+runes[0]["SUM(intelligence)"]} \n\n'
+    else:
+        status = f'\n\nВы:\n'
+        status += f' ❤{player_current[0]["health"]}/{player[0]["health"]} '
+        status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]} '
+        status += f'⚡{player_current[0]["dexterity"]}/{costattack[0]["costattack"]} \n'
+        status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
+        status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
+        status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
     print(f'Print battle panel about player for {idvk}')
     return status
 
@@ -1242,10 +1253,11 @@ def print_battle_turn_mob(idvk):
     mobname = f'Синий слизень'
     player = select('mob', 'attack, defence, defencemagic, dexterity, intelligence, health', idvk)
     player_current = select('mob_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
+    costattack = select('setting', 'costattack', idvk)
     status = f'\n\n{mobname}:\n'
     status += f' ❤{player_current[0]["health"]}/{player[0]["health"]} '
     status += f' 🛡{player_current[0]["defence"]}/{player[0]["defence"]} '
-    status += f'⚡{player_current[0]["dexterity"]}/{player[0]["dexterity"]} \n'
+    status += f'⚡{player_current[0]["dexterity"]}/{costattack[0]["costattack"]} \n'
     status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
     status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
     status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
