@@ -3,9 +3,7 @@ from os import stat
 import random
 import sqlite3
 from modules.sqlite.connect import con
-from modules.sqlite.engine.printer import print_mob_profile, print_rune_last_gen
-from modules.sqlite.engine.select import battle_dexterity_equal, be, select
-from modules.sqlite.engine.update import use_runes_equip
+from modules.sqlite.engine.select import battle_dexterity_equal, be, select, print_mob_profile, print_rune_last_gen
 
 def register(idvk):
     #создание персонажа
@@ -311,7 +309,7 @@ def generate_rune(idvk):
         if (stat == 8 and loot == 0):
             loot = random.SystemRandom(lvl).randint(-lvl, lvl) + random.SystemRandom(lvl).randint(0, lvl)*random.SystemRandom(lvl).uniform(-0.30, 0.30)
             points = points - 1"""
-    
+
     cursor = con()
     #Инициализация новой руны
     sqlite_insert_with_param = """INSERT OR IGNORE INTO rune
@@ -473,12 +471,7 @@ def delete_item(table, idvk, itemid):
     print(f'Deleted item {table} {itemid} for {idvk}')
     cursor.close()
 
-def select(table, row, idvk):
-    cursor = con()
-    cursor.row_factory = sqlite3.Row
-    line = cursor.execute(f'SELECT {row} FROM {table} WHERE idvk = {idvk}')
-    rows  = line.fetchall()
-    return rows
+
     
 def select_item(table, row, idvk, itemid):
     cursor = con()
@@ -494,20 +487,7 @@ def select_equip(table, row, idvk):
     rows  = line.fetchall()
     return rows
 
-def be(idvk):
-    #проверка на наличие аккаунта
-    info = select('player', 'id', idvk)
-    if (not info):
-        return False
-    return True
 
-def battle_dexterity_equal(idvk):
-    player = select('player', 'dexterity', idvk)
-    mob = select('mob', 'dexterity', idvk)
-    if (player[0]["dexterity"] > mob[0]["dexterity"]):
-        return mob[0]["dexterity"]
-    else:
-        return player[0]["dexterity"]
 
 def reseach(idvk):
     delete('mob_current',idvk)
@@ -520,3 +500,35 @@ def reseach(idvk):
     use_runes_equip(idvk)
     status = print_mob_profile(idvk)
     return status
+
+def update(table, row, data, idvk):
+    cursor = con()
+    sql_update_query = (f'UPDATE {table} SET {row} = ? WHERE idvk = ?;')
+    data_tuple = (data, idvk)
+    cursor.execute(sql_update_query, data_tuple)
+    cursor.commit()
+    cursor.commit()
+    cursor.close()
+
+
+def use_runes_equip(idvk):
+    runes = select_equip('rune',
+                         'SUM(attack), SUM(defence), SUM(defencemagic), SUM(dexterity), SUM(intelligence), SUM(health)',
+                         idvk)
+    if (runes[0]["SUM(attack)"] != None):
+        player = select('player_current', 'attack, defence, defencemagic, dexterity, intelligence, health, mana', idvk)
+        attack = player[0]["attack"] + runes[0]["SUM(attack)"]
+        update('player_current', 'attack', attack, idvk)
+        defence = player[0]["defence"] + runes[0]["SUM(defence)"]
+        update('player_current', 'defence', defence, idvk)
+        defencemagic = player[0]["defencemagic"] + runes[0]["SUM(defencemagic)"]
+        update('player_current', 'defencemagic', defencemagic, idvk)
+        dexterity = player[0]["dexterity"] + runes[0]["SUM(dexterity)"]
+        update('player_current', 'dexterity', dexterity, idvk)
+        intelligence = player[0]["intelligence"] + runes[0]["SUM(intelligence)"]
+        update('player_current', 'intelligence', intelligence, idvk)
+        health = player[0]["health"] + runes[0]["SUM(health)"]
+        update('player_current', 'health', health, idvk)
+        mana = player[0]["mana"] + runes[0]["SUM(intelligence)"]
+        update('player_current', 'mana', mana, idvk)
+        print(f'Runes activated for player {idvk}')
