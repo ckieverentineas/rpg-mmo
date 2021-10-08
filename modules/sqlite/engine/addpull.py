@@ -619,8 +619,10 @@ def player_attack_defence(idvk):
     mob = select('mob_current','health, defence', idvk)
     damage = player[0]["attack"] - mob[0]["defence"]
     status = ""
+    result = 0
     if (damage > 0):
         health = mob[0]["health"] - damage
+        result = damage
         status += f'\n\n⚔Вы нанесли {damage} урона.\n\n'
         update('mob_current', 'health', health, idvk)
         print(f'Mob was attacked and got {damage} damage by player {idvk}')
@@ -631,7 +633,7 @@ def player_attack_defence(idvk):
         update('player_current', 'attack', player[0]["attack"]-1, idvk)
     if (mob[0]["defence"] > 0 ):
         update('mob_current', 'defence', mob[0]["defence"]-1, idvk)
-    return status
+    return result
 
 
 def mob_attack_defence(idvk):
@@ -640,50 +642,67 @@ def mob_attack_defence(idvk):
     mob = select('player_current','health, defence', idvk)
     damage = player[0]["attack"] - mob[0]["defence"]
     status = ""
+    result = 0
     if (damage > 0):
         health = mob[0]["health"] - damage
-        status += f'\n\n⚔Моб нанес {damage} урона.\n\n'
+        status = f'\n\n⚔Моб нанес {damage} урона.\n\n'
+        result = damage
         update('player_current', 'health', health, idvk)
         print(f'Mob doing attack and took {damage} damage for player {idvk}')
     else:
         status += f'\n⚒Моб не смог пробить броню. Нанесено 0 урона\n'
         print(f'Mob doing attack and not took damage for player {idvk}')
+        result = 0
     if (player[0]["attack"] > 1):
         update('mob_current', 'attack', player[0]["attack"]-1, idvk)
     if (mob[0]["defence"] > 0 ):
         update('player_current', 'defence', mob[0]["defence"]-1, idvk)
-    return status
+    return result
 
 def player_turn(idvk):
     #Ход игрока
     costattack = select('setting', 'costattack', idvk)
     playerdex = select('player_current', 'dexterity', idvk)
     status = ""
-    while (playerdex[0]["dexterity"] >= costattack[0]["costattack"]):
+    turns = 0
+    damage = 0
+    dexterity = playerdex[0]["dexterity"]
+    while (dexterity >= costattack[0]["costattack"]):
         print(f'Now turn player by {idvk}')
-        status += player_attack_defence(idvk)
-        update('player_current', 'dexterity', playerdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
+        damage = player_attack_defence(idvk)
+        print(f'DMG {damage} and DEX {dexterity}')
+        update('player_current', 'dexterity', dexterity - costattack[0]["costattack"], idvk)
         playerdex = select('player_current', 'dexterity', idvk)
+        dexterity = playerdex[0]["dexterity"]
         #проверка победы игрока
         winner = player_win_bool(idvk)
-        if (winner != False):
+        turns += turns + 1
+        if (winner == True):
+            status += f'\n\nВы нанесли {damage} x{turns}\n\n'
             return status
-        return status
+    status += f'\n\nВы нанесли {damage} x{turns}\n\n'
     return status
 
 def mob_turn(idvk):
+    mobname = f'Синий слизень'
     costattack = select('setting', 'costattack', idvk)
     mobdex = select('mob_current', 'dexterity', idvk)
     status = ""
+    turns = 0
+    damage = 0
     while (mobdex[0]["dexterity"] >= costattack[0]["costattack"]):
         print(f'Now turn mob for {idvk}')
-        status += mob_attack_defence(idvk)
+        damage = mob_attack_defence(idvk)
+        print(f'DMG {damage} and DEX {mobdex[0]["dexterity"]} and PRC {costattack[0]["costattack"]}')
+        turns = turns + 1
         update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         mobdex = select('mob_current', 'dexterity', idvk)
         #проверка на смерть игрока
         winner = player_dead(idvk)
         if (winner != False):
+            status += f'\n\n{mobname} нанес {damage} x{turns}\n\n'
             return status
+    status += f'\n\n{mobname} нанес {damage} x{turns}\n\n'
     return status
 
 def battle_add_energy(idvk):
@@ -786,10 +805,10 @@ def battle_control(idvk):
             status += winner
             return status
         #проверка на передачу хода игроку
-        check = player_turn_return(idvk)
+        """check = player_turn_return(idvk)
         if (check != False):
             status += check
-            return status
+            return status"""
         #атака моба
         status += mob_turn(idvk)
         #проверка на смерть игрока
@@ -816,10 +835,10 @@ def battle_control(idvk):
             status += winner
             return status
         #проверка на передачу хода игроку
-        check = player_turn_return(idvk)
+        """check = player_turn_return(idvk)
         if (check != False):
             status += check
-            return status
+            return status"""
         #Начисление энергии
         status += battle_add_energy(idvk)
         return status
@@ -1124,9 +1143,10 @@ def reseach(idvk):
     delete('mob',idvk)
     generate_mob(idvk)
     generate_battle(idvk)
-    costattack = battle_dexterity_equal(idvk)
-    update('setting', 'costattack', costattack, idvk)
     use_runes_equip(idvk)
+    costattack = battle_dexterity_equal(idvk)
+    print(f'Price for attack {costattack} by player {idvk}')
+    update('setting', 'costattack', costattack, idvk)
     status = print_mob_profile(idvk)
     return status
 
@@ -1364,7 +1384,7 @@ def be(idvk):
     return True
 
 def battle_dexterity_equal(idvk):
-    player = select('player', 'dexterity', idvk)
+    player = select('player_current', 'dexterity', idvk)
     mob = select('mob', 'dexterity', idvk)
     if (player[0]["dexterity"] > mob[0]["dexterity"]):
         return mob[0]["dexterity"]
