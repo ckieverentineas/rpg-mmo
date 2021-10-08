@@ -35,7 +35,11 @@ def keyboards(text):
         "~мзащ": keyboard_altar_rune_rerol,
         "~лвк": keyboard_altar_rune_rerol,
         "~инт": keyboard_altar_rune_rerol,
-        "~здр": keyboard_altar_rune_rerol
+        "~здр": keyboard_altar_rune_rerol,
+        "+ур10": keyboard_back,
+        "-ур10": keyboard_back,
+        "+ур100": keyboard_back,
+        "-ур100": keyboard_back,
     }
     try:
         keyboards = config[text.lower()]()
@@ -43,6 +47,20 @@ def keyboards(text):
     except KeyError as e:
         print(f'Not found action for {e}')
         return False
+
+def keyboard_lvl():
+    keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('-ур10', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+ур10', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('-100', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+100', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
+    keyboards.add_button('+ур', color=VkKeyboardColor.SECONDARY)
+    keyboards.add_line()
+    keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
+    return keyboards
 
 def keyboard_register():
     keyboards = VkKeyboard(one_time=True)

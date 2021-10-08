@@ -19,6 +19,10 @@ async def checking(idvk, text):
         "атака": battle_control,
         "+ур": lvl_next,
         "-ур": lvl_down,
+        "+ур10": lvl_next10,
+        "-ур10": lvl_down10,
+        "+ур100": lvl_next100,
+        "-ур100": lvl_down100,
         "wipe": reward,
         "руна": print_rune,
         "надеть": rune_equip,
@@ -43,7 +47,7 @@ async def checking(idvk, text):
     try:
         text = text.lower()
         if (be(idvk) == True or text == "начать"):
-            status = config[re.sub('\d', '', text)](idvk)
+            status = config[text](idvk)
             return str(status), True
         else:
             status = f'Напишите: Начать\n Чтобы инициализировать аккаунт.'

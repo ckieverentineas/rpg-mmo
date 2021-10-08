@@ -227,7 +227,7 @@ def generate_reward_for_player(idvk):
     epic = 30
     rare = 20
     unusual = 70
-    usual = 130
+    usual = 150
     crdate = datetime.datetime.now()
     cursor = con()
     #Инициализация нового игрока
@@ -850,6 +850,24 @@ def lvl_next(idvk):
     status = f'📝Вы прошли вглубь в лес на {lvl+1} аршина'
     return status
 
+def lvl_next10(idvk):
+    #смена локации вверх
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl = lvlloc[0]["lvl"]
+    update('setting', 'lvl', lvl+10, idvk)
+    print(f'Level next on {lvl+10} for {idvk}')
+    status = f'📝Вы прошли вглубь в лес на {lvl+10} аршина'
+    return status
+
+def lvl_next100(idvk):
+    #смена локации вверх
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl = lvlloc[0]["lvl"]
+    update('setting', 'lvl', lvl+100, idvk)
+    print(f'Level next on {lvl+100} for {idvk}')
+    status = f'📝Вы прошли вглубь в лес на {lvl+100} аршина'
+    return status
+
 def lvl_down(idvk):
     #смена локации вниз
     lvlloc = select('setting', 'lvl', idvk)
@@ -858,6 +876,30 @@ def lvl_down(idvk):
         update('setting', 'lvl', lvl-1, idvk)
         print(f'Level down on {lvl} for {idvk}')
         status = f'📝Вы пошли в сторону света на {lvl-1} аршина'
+        return status
+    status = f'Никто, асбсолютно никто там еще не был!'
+    return status
+
+def lvl_down10(idvk):
+    #смена локации вниз
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl =lvlloc[0]["lvl"]
+    if (lvl >= 1):
+        update('setting', 'lvl', lvl-10, idvk)
+        print(f'Level down on {lvl-10} for {idvk}')
+        status = f'📝Вы пошли в сторону света на {lvl-10} аршина'
+        return status
+    status = f'Никто, асбсолютно никто там еще не был!'
+    return status
+
+def lvl_down100(idvk):
+    #смена локации вниз
+    lvlloc = select('setting', 'lvl', idvk)
+    lvl =lvlloc[0]["lvl"]
+    if (lvl >= 1):
+        update('setting', 'lvl', lvl-100, idvk)
+        print(f'Level down on {lvl-100} for {idvk}')
+        status = f'📝Вы пошли в сторону света на {lvl-100} аршина'
         return status
     status = f'Никто, асбсолютно никто там еще не был!'
     return status
