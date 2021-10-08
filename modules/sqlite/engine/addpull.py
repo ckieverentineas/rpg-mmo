@@ -677,9 +677,9 @@ def player_turn(idvk):
         winner = player_win_bool(idvk)
         turns += turns + 1
         if (winner == True):
-            status += f'\n\nВы нанесли {damage} x{turns}\n\n'
+            status += f'\n\n⚔Вы нанесли {damage} x{turns}\n\n'
             return status
-    status += f'\n\nВы нанесли {damage} x{turns}\n\n'
+    status += f'\n\n⚔Вы нанесли {damage} x{turns}\n\n'
     return status
 
 def mob_turn(idvk):
@@ -698,9 +698,9 @@ def mob_turn(idvk):
         #проверка на смерть игрока
         winner = player_dead(idvk)
         if (winner != False):
-            status += f'\n\n{mobname} нанес {damage} x{turns}\n\n'
+            status += f'\n\n⚔{mobname} нанес {damage} x{turns}\n\n'
             return status
-    status += f'\n\n{mobname} нанес {damage} x{turns}\n\n'
+    status += f'\n\n⚔{mobname} нанес {damage} x{turns}\n\n'
     return status
 
 def battle_add_energy(idvk):
