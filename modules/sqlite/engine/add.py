@@ -1,8 +1,11 @@
 import datetime
 from os import stat
 import random
+import sqlite3
 from modules.sqlite.connect import con
+from modules.sqlite.engine.printer import print_mob_profile, print_rune_last_gen
 from modules.sqlite.engine.select import battle_dexterity_equal, be, select
+from modules.sqlite.engine.update import use_runes_equip
 
 def register(idvk):
     #создание персонажа

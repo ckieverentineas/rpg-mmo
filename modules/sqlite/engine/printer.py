@@ -1,6 +1,7 @@
 
 #Выводы данных из баз данных
 from modules.sqlite.engine.add import battle_dexterity_equal, select, select_equip
+from modules.sqlite.engine.select import select_item
 
 
 def print_profile(idvk):
