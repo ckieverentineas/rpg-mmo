@@ -670,7 +670,6 @@ def player_turn(idvk):
     while (dexterity >= costattack[0]["costattack"]):
         print(f'Now turn player by {idvk}')
         damage = player_attack_defence(idvk)
-        print(f'DMG {damage} and DEX {dexterity}')
         update('player_current', 'dexterity', dexterity - costattack[0]["costattack"], idvk)
         playerdex = select('player_current', 'dexterity', idvk)
         dexterity = playerdex[0]["dexterity"]
@@ -693,7 +692,6 @@ def mob_turn(idvk):
     while (mobdex[0]["dexterity"] >= costattack[0]["costattack"]):
         print(f'Now turn mob for {idvk}')
         damage = mob_attack_defence(idvk)
-        print(f'DMG {damage} and DEX {mobdex[0]["dexterity"]} and PRC {costattack[0]["costattack"]}')
         turns = turns + 1
         update('mob_current', 'dexterity', mobdex[0]["dexterity"] - costattack[0]["costattack"], idvk)
         mobdex = select('mob_current', 'dexterity', idvk)
