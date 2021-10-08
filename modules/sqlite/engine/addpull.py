@@ -219,15 +219,15 @@ def generate_inventory_for_player(idvk):
 
 def generate_reward_for_player(idvk):
     #создание настроек персонажа
-    lvl = 18
-    points = 18
+    lvl = 20
+    points = 20
     gold = 3655
     mythical = 0
     legendary = 0
     epic = 30
-    rare = 10
+    rare = 20
     unusual = 70
-    usual = 110
+    usual = 130
     crdate = datetime.datetime.now()
     cursor = con()
     #Инициализация нового игрока
@@ -1235,6 +1235,29 @@ def back(idvk):
 def altar(idvk):
     #путь назад
     status = f'Возможно именно здесь была создана первая руна...'
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                status += f'\n\nТекущая руна:\n\n'
+                status += print_rune(idvk)
+                print(f'Rune {iditem} will current for player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nТекущая рунна не обнаружена, переход к первому предмету.\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
     return str(status)
 
 def command_attack(idvk):
@@ -1291,8 +1314,8 @@ def print_rune_last_gen(idvk):
     dexterity = player[-1]["dexterity"]
     intelligence = player[-1]["intelligence"]
     health = player[-1]["health"]
-    status = f'\n\n🧿Руна {player[-1]["id"]}\n'
-    status += f'📝Уровень: {player[-1]["lvl"]} \n'
+    status = f'\n\n🧿Руна {player[-1]["id"]}\n\n'
+    status += f'📝Уровень: {player[-1]["lvl"]} \n\n'
     if (health != 0):
         status += f'❤Здоровье: {health}\n'
     if (attack != 0):
@@ -1323,8 +1346,8 @@ def print_rune(idvk):
             dexterity = player[0]["dexterity"]
             intelligence = player[0]["intelligence"]
             health = player[0]["health"]
-            status = f'\n\n🧿Руна {player[0]["id"]}\n'
-            status += f'📝Уровень: {player[0]["lvl"]} \n'
+            status = f'\n\n🧿Руна {player[0]["id"]}\n\n'
+            status += f'📝Уровень: {player[0]["lvl"]} \n\n'
             if (health != 0):
                 status += f'❤Здоровье: {health}\n'
             if (attack != 0):
@@ -1388,3 +1411,234 @@ def battle_dexterity_equal(idvk):
         return mob[0]["dexterity"]
     else:
         return player[0]["dexterity"]
+
+def rune_rerol(idvk):
+    status = f'Возможно удастя все исправить?!'
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                status += f'\n\nВыбранная руна:\n\n'
+                status += print_rune(idvk)
+                print(f'Rune {iditem} will current for player {idvk}')
+                return status
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nВыбранная рунна не обнаружена, переход к первому предмету.\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_attack(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, attack', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["attack"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'attack', stat, idvk, iditem)
+                    result = select_item('rune', 'attack', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} атака изменилась с {check[0]["attack"]} на {result[0]["attack"]}\n\n'
+                    print(f'Rune {iditem} change attack for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_defence(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, defence', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["defence"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'defence', stat, idvk, iditem)
+                    result = select_item('rune', 'defence', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} физическая защита изменилась с {check[0]["defence"]} на {result[0]["defence"]}\n\n'
+                    print(f'Rune {iditem} change defence for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_defencemagic(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, defencemagic', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["defencemagic"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'defencemagic', stat, idvk, iditem)
+                    result = select_item('rune', 'defencemagic', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} магическая защита изменилась с {check[0]["defencemagic"]} на {result[0]["defencemagic"]}\n\n'
+                    print(f'Rune {iditem} change defencemagic for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_dexterity(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, dexterity', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["dexterity"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'dexterity', stat, idvk, iditem)
+                    result = select_item('rune', 'dexterity', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} ловкость изменилась с {check[0]["dexterity"]} на {result[0]["dexterity"]}\n\n'
+                    print(f'Rune {iditem} change dexterity for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_intelligence(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, intelligence', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["intelligence"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'intelligence', stat, idvk, iditem)
+                    result = select_item('rune', 'intelligence', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} интеллект изменился с {check[0]["intelligence"]} на {result[0]["intelligence"]}\n\n'
+                    print(f'Rune {iditem} change intelligence for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)
+
+def rune_rerol_health(idvk):
+    rune = select('rune', 'id', idvk)
+    item = select('setting', 'itemid', idvk)
+    itemid = item[0]["itemid"]
+    status = ""
+    try:
+        if (rune[itemid]["id"] and itemid <= 20):
+            iditem = rune[itemid]["id"]
+            check = select_item('rune', 'id, lvl, health', idvk, iditem)
+            if (check[0]["id"] == iditem):
+                lvl = check[0]["lvl"]
+                if(check[0]["health"] != 0):
+                    stat = 0
+                    while (stat == 0):
+                        stat = random.SystemRandom(lvl).randint(-lvl, lvl)
+                    update_item('rune', 'health', stat, idvk, iditem)
+                    result = select_item('rune', 'health', idvk, iditem)
+                    status += f'\n\nУ руны {iditem} здоровье изменился с {check[0]["health"]} на {result[0]["health"]}\n\n'
+                    print(f'Rune {iditem} change health for player {idvk}')
+                    return status
+                else:
+                    return f'Руна {iditem} не обладает таким свойством'
+            else:
+                status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
+                print(f'Rune {iditem} not be for player {idvk}')
+                return status
+    except:
+        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        update('setting', 'itemid', 0, idvk)
+        status += print_rune(idvk)
+        print(f'Not found current rune for player {idvk}')
+        return status
+    return str(status)

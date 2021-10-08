@@ -26,7 +26,16 @@ def keyboards(text):
         "--руна": keyboard_altar,
         "wipe": keyboard_profile,
         "алтарь": keyboard_altar,
-        "создать": keyboard_altar
+        "создать": keyboard_altar,
+        "изменить руну": keyboard_altar_rune_rerol,
+        "~+руна": keyboard_altar_rune_rerol,
+        "~-руна": keyboard_altar_rune_rerol,
+        "~атк": keyboard_altar_rune_rerol,
+        "~фзащ": keyboard_altar_rune_rerol,
+        "~мзащ": keyboard_altar_rune_rerol,
+        "~лвк": keyboard_altar_rune_rerol,
+        "~инт": keyboard_altar_rune_rerol,
+        "~здр": keyboard_altar_rune_rerol
     }
     try:
         keyboards = config[text.lower()]()
@@ -111,12 +120,31 @@ def keyboard_rune():
 
 def keyboard_altar():
     keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('Изменить руну', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
     keyboards.add_button('СОЗДАТЬ', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('--Руна', color=VkKeyboardColor.PRIMARY)
     keyboards.add_button('++Руна', color=VkKeyboardColor.PRIMARY)
     keyboards.add_line()
     keyboards.add_button('СЛОМАТЬ', color=VkKeyboardColor.NEGATIVE)
+    keyboards.add_line()
+    keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
+    return keyboards
+
+def keyboard_altar_rune_rerol():
+    keyboards = VkKeyboard(one_time=True)
+    keyboards.add_button('~атк', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('~здр', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('~лвк', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('~инт', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('~фзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('~мзащ', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_line()
+    keyboards.add_button('~-Руна', color=VkKeyboardColor.PRIMARY)
+    keyboards.add_button('~+Руна', color=VkKeyboardColor.PRIMARY)
     keyboards.add_line()
     keyboards.add_button('Назад', color=VkKeyboardColor.SECONDARY)
     return keyboards

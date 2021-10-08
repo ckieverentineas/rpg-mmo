@@ -29,7 +29,16 @@ async def checking(idvk, text):
         "++руна": rune_next,
         "--руна": rune_down,
         "создать": creator,
-        "алтарь": altar
+        "алтарь": altar,
+        "изменить руну": rune_rerol,
+        "~+руна": rune_next,
+        "~-руна": rune_down,
+        "~атк": rune_rerol_attack,
+        "~фзащ": rune_rerol_defence,
+        "~мзащ": rune_rerol_defencemagic,
+        "~лвк": rune_rerol_dexterity,
+        "~инт": rune_rerol_intelligence,
+        "~здр": rune_rerol_health
     }
     try:
         text = text.lower()
