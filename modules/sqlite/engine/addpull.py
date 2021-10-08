@@ -1274,7 +1274,7 @@ def print_rune_last_gen(idvk):
     intelligence = player[-1]["intelligence"]
     health = player[-1]["health"]
     status = f'\n\n🧿Руна {player[-1]["id"]}\n'
-    status += f'📝Уровень: {player[0]["lvl"]} \n'
+    status += f'📝Уровень: {player[-1]["lvl"]} \n'
     if (health != 0):
         status += f'❤Здоровье: {health}\n'
     if (attack != 0):
