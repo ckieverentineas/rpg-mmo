@@ -40,6 +40,7 @@ def keyboards(text):
         "-ур10": keyboard_back,
         "+ур100": keyboard_back,
         "-ур100": keyboard_back,
+        "спелл": keyboard_battle
     }
     try:
         keyboards = config[text.lower()]()
@@ -116,6 +117,7 @@ def keyboard_back():
 def keyboard_battle():
     keyboards = VkKeyboard(one_time=True)
     keyboards.add_button('Атака', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Спелл', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()

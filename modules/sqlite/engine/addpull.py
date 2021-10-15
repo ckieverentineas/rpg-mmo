@@ -155,7 +155,7 @@ def generate_battle(idvk):
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
     data_tuple = (idvk, player[0]["attack"], player[0]["defence"], player[0]["defencemagic"],
                   player[0]["dexterity"], player[0]["intelligence"],
-                  player[0]["health"], player[0]["intelligence"]*2, crdate)
+                  player[0]["health"], player[0]["intelligence"]*4, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     #подготовка к битве моба
@@ -164,7 +164,7 @@ def generate_battle(idvk):
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"""
     data_tuple = (idvk, mob[0]["attack"], mob[0]["defence"], mob[0]["defencemagic"],
                   mob[0]["dexterity"], mob[0]["intelligence"],
-                  mob[0]["health"], mob[0]["intelligence"]*2, crdate)
+                  mob[0]["health"], mob[0]["intelligence"]*4, crdate)
     cursor.execute(sqlite_insert_with_param, data_tuple)
     cursor.commit()
     cursor.close()
@@ -1327,7 +1327,7 @@ def print_battle_turn_player(idvk):
         status += f'⚡{player_current[0]["dexterity"]}/{costattack[0]["costattack"]} \n'
         status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
         status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
-        status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
+        status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*4} \n\n'
     print(f'Print battle panel about player for {idvk}')
     return status
 
@@ -1343,7 +1343,7 @@ def print_battle_turn_mob(idvk):
     status += f'⚡{player_current[0]["dexterity"]}/{costattack[0]["costattack"]} \n'
     status += f' 🗡{player_current[0]["attack"]}/{player[0]["attack"]} ' 
     status += f' 🔰{player_current[0]["defencemagic"]}/{player[0]["defencemagic"]} '
-    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*2} \n\n'
+    status += f'🔷{player_current[0]["mana"]}/{player[0]["intelligence"]*4} \n\n'
     print(f'Print battle panel about mob for {idvk}')
     return status
 
@@ -1684,3 +1684,130 @@ def rune_rerol_health(idvk):
         print(f'Not found current rune for player {idvk}')
         return status
     return str(status)
+
+def battle_control_spell(idvk):
+    #контролер заклинаний
+    mobcheck = select('mob_current', 'health', idvk)
+    playercheck = select('player_current', 'health', idvk)
+    status = ""
+    if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
+        status += f'\n\nВаше заклинание пронизывает воздух, как насчет исследовать дальше?\n'
+        status += f'P.s. жмите кнопку "Исследовать" или повысьте здоровье\n'
+        return status
+    player = select('player', 'dexterity', idvk)
+    mob = select('mob', 'dexterity', idvk)
+    runes = select_equip('rune', 'SUM(dexterity)', idvk)
+    dex = player[0]["dexterity"]
+    if (runes[0]["SUM(dexterity)"] != None):
+        dex = dex + runes[0]["SUM(dexterity)"]
+    status = ""
+    playermana = select('player_current', 'mana', idvk)
+    mobmana = select('mob_current', 'mana', idvk)
+    playerlvl = select('player', 'lvl', idvk)
+    moblvl = select('mob', 'lvl', idvk)
+    if (dex >= mob[0]["dexterity"]):
+        #атака игрока с преобладающей ловкостью
+        if (playermana[0]["mana"] > moblvl[0]["lvl"]):
+            status += player_attack_defencemagic(idvk)
+        else:
+            status += "\n\nНедостаточно маны для каста спелла\n\n"
+        #проверка победы игрока
+        winner = player_win(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #проверка на передачу хода игроку
+        """check = player_turn_return(idvk)
+        if (check != False):
+            status += check
+            return status"""
+        #атака моба
+        if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
+            status += mob_attack_defencemagic(idvk)
+        else:
+            status += "\n\nМоб пропускает свой каст спелла\n\n"
+        #проверка на смерть игрока
+        winner = player_dead(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #начисление энергии
+        status += battle_add_energy(idvk)
+        status += print_battle_turn_mob(idvk)
+        status += print_battle_turn_player(idvk)
+        return status
+    else:
+        #атака моба по игроку
+        if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
+            status += mob_attack_defencemagic(idvk)
+        else:
+            status += "\n\nМоб пропускает свой каст спелла\n\n"
+        #проверка на смерть игрока
+        winner = player_dead(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #атака игрока по мобу
+        if (playermana[0]["mana"] > moblvl[0]["lvl"]):
+            status += player_attack_defencemagic(idvk)
+        else:
+            status += "\n\nНедостаточно маны для каста спелла\n\n"
+        #проверка победы игрока
+        winner = player_win(idvk)
+        if (winner != False):
+            status += winner
+            return status
+        #проверка на передачу хода игроку
+        """check = player_turn_return(idvk)
+        if (check != False):
+            status += check
+            return status"""
+        #Начисление энергии
+        status += battle_add_energy(idvk)
+        status += print_battle_turn_mob(idvk)
+        status += print_battle_turn_player(idvk)
+        return status
+
+def player_attack_defencemagic(idvk):
+    #магическая атака игрока
+    player = select('player_current', 'intelligence, mana', idvk)
+    moblvl = select('mob','lvl', idvk)
+    mob = select('mob_current','health, defencemagic', idvk)
+    damage = player[0]["intelligence"] - mob[0]["defencemagic"]
+    status = ""
+    if (damage > 0):
+        health = mob[0]["health"] - damage
+        status += f'\n\n⚔Вы нанесли {damage} магического урона.\n\n'
+        update('mob_current', 'health', health, idvk)
+        print(f'Mob was attacked magic attack and got {damage} damage by player {idvk}')
+    else:
+        status += f'\nВаше заклинание не достаточно сильно\n'
+        print(f'Mob was attacked magic attack and not got damage by player {idvk}')
+    if (player[0]["mana"] > moblvl[0]["lvl"]):
+        update('player_current', 'mana', player[0]["mana"]-moblvl[0]["lvl"], idvk)
+    if (mob[0]["defencemagic"] > 0 ):
+        update('mob_current', 'defencemagic', mob[0]["defencemagic"]-1, idvk)
+    return status
+
+
+def mob_attack_defencemagic(idvk):
+    #атака моба
+    player = select('mob_current', 'intelligence, mana', idvk)
+    moblvl = select('player','lvl', idvk)
+    mob = select('player_current','health, defencemagic', idvk)
+    damage = player[0]["intelligence"] - mob[0]["defencemagic"]
+    status = ""
+    if (damage > 0):
+        health = mob[0]["health"] - damage
+        status = f'\n\n⚔Моб кастанул спелл, вы получили {damage} урона.\n\n'
+        update('player_current', 'health', health, idvk)
+        print(f'Mob doing magic attack and took {damage} damage for player {idvk}')
+    else:
+        status += f'\n⚒Моб не смог пробить пронизать магическую защиту. Нанесено 0 урона\n'
+        print(f'Mob doing attack magic and not took damage for player {idvk}')
+        result = 0
+    if (player[0]["mana"] > moblvl[0]["lvl"]):
+        update('mob_current', 'mana', player[0]["mana"]-moblvl[0]["lvl"], idvk)
+    if (mob[0]["defencemagic"] > 0 ):
+        update('player_current', 'defencemagic', mob[0]["defencemagic"]-1, idvk)
+    return status

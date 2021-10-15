@@ -42,7 +42,8 @@ async def checking(idvk, text):
         "~мзащ": rune_rerol_defencemagic,
         "~лвк": rune_rerol_dexterity,
         "~инт": rune_rerol_intelligence,
-        "~здр": rune_rerol_health
+        "~здр": rune_rerol_health,
+        "спелл": battle_control_spell
     }
     try:
         text = text.lower()

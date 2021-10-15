@@ -20,12 +20,15 @@ async def get_longpoll():
     try:
         try:
             longpoll = VkLongPoll(vk_session)
+            #смотрим события в лс группы вк
             for event in longpoll.listen():
+                #если написали нам
                 if (event.type == VkEventType.MESSAGE_NEW
                     and event.to_me and event.text):
                     user_id = event.user_id
                     random_id = get_random_id()
                     text = event.text
+                    #то извлекаем текст сообщения и обрабатываем события можно сказать в движке игры
                     res, sending = await checking(user_id, text)
                     #отправка ответа пользователю
                     if (sending == True):
