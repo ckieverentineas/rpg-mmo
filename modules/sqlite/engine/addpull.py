@@ -978,16 +978,21 @@ def rune_equip(idvk):
     rune = select('rune', 'id', idvk)
     item = select('setting', 'itemid', idvk)
     itemid = item[0]["itemid"]
+    player = select('player', 'lvl', idvk)
     status = ""
     try:
         if (rune[itemid]["id"]):
             iditem = rune[itemid]["id"]
-            check = select_item('rune', 'equip', idvk, iditem)
+            check = select_item('rune', 'equip, lvl', idvk, iditem)
             if (check[0]["equip"] == "no"):
-                update_item('rune', 'equip', "yes", idvk, iditem)
-                status += f'\n\n🧿Руна {iditem} надета\n\n'
-                print(f'Rune {iditem} equip by player {idvk}')
-                return status
+                if (player[0]["lvl"] + 10 >= check[0]["lvl"]):
+                    update_item('rune', 'equip', "yes", idvk, iditem)
+                    status += f'\n\n🧿Руна {iditem} надета\n\n'
+                    print(f'Rune {iditem} equip by player {idvk}')
+                    return status
+                else:
+                    status = f'Ваш уровень {player[0]["lvl"]}, уровень руны {check[0]["lvl"]}. \n Для надевания руны необходимо еще {check[0]["lvl"] -player[0]["lvl"] - 10} уровней'
+                    return status
             else:
                 status += f'\n\n🧿Руна {iditem} уже экипирована\n\n'
                 print(f'Rune {iditem} already equip by player {idvk}')
