@@ -374,7 +374,7 @@ def creator(idvk):
             target = f'unusual'
             points = 3
             statusr = f'\nВы создали редкую руну\n'
-        if (usual >= 0):
+        if (usual >= 10):
             target = f'usual'
             points = 2
             statusr = f'\nВы создали необычную руну\n'
@@ -1810,4 +1810,22 @@ def mob_attack_defencemagic(idvk):
         update('mob_current', 'mana', player[0]["mana"]-moblvl[0]["lvl"], idvk)
     if (mob[0]["defencemagic"] > 0 ):
         update('player_current', 'defencemagic', mob[0]["defencemagic"]-1, idvk)
+    return status
+
+def print_inventory_runes(idvk):
+    inventory = select('inventory', 'mythical, legendary, epic, rare, unusual, usual', idvk)
+    mythical = inventory[0]["mythical"]
+    legendary = inventory[0]["legendary"]
+    epic = inventory[0]["epic"]
+    rare = inventory[0]["rare"]
+    unusual = inventory[0]["unusual"]
+    usual = inventory[0]["usual"]
+    status = f'\n\nВ вашем инвенторе лежат следующие обломки рун:\n\n'
+    status += f'Мифические: {mythical}\n'
+    status += f'Легендарные: {legendary}\n'
+    status += f'Эпические: {epic}\n'
+    status += f'Редкие: {rare}\n'
+    status += f'Необычные: {unusual}\n'
+    status += f'Обычные: {usual}\n\n'
+    print(f'Inventory runes for player {idvk}')
     return status
