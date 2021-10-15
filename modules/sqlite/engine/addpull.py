@@ -1126,6 +1126,8 @@ def rune_destroy(idvk, iditem):
     destroy = select('inventory', target, idvk)
     update('inventory', target, destroy[0][target]+1, idvk)
     print(f'Rune {target} destroy for player {idvk}')
+    inventory = select('inventory', target, idvk)
+    status += f'Обломков {target} в инвенторе теперь увеличилось с {destroy[0][target]} до {inventory[0][target]}'
     return status
 
 def rune_delete(idvk):
@@ -1289,6 +1291,7 @@ def altar(idvk):
                 status += f'\n\nТекущая руна:\n\n'
                 status += print_rune(idvk)
                 print(f'Rune {iditem} will current for player {idvk}')
+                status += print_inventory_runes(idvk)
                 return status
             else:
                 status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
@@ -1827,5 +1830,5 @@ def print_inventory_runes(idvk):
     status += f'Редкие: {rare}\n'
     status += f'Необычные: {unusual}\n'
     status += f'Обычные: {usual}\n\n'
-    print(f'Inventory runes for player {idvk}')
+    print(f'Print inventory runes for player {idvk}')
     return status

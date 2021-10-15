@@ -40,7 +40,8 @@ def keyboards(text):
         "-ур10": keyboard_back,
         "+ур100": keyboard_back,
         "-ур100": keyboard_back,
-        "спелл": keyboard_battle
+        "спелл": keyboard_battle,
+        "инвентарь": keyboard_back
     }
     try:
         keyboards = config[text.lower()]()
@@ -103,10 +104,10 @@ def keyboard_points_up():
 def keyboard_back():
     keyboards = VkKeyboard(one_time=True)
     keyboards.add_button('Профиль', color=VkKeyboardColor.POSITIVE)
-    keyboards.add_line()
-    keyboards.add_button('Руна', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Инвентарь', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('Алтарь', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('Руна', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('Исследовать', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
