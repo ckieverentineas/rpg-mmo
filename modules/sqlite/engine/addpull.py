@@ -11,15 +11,15 @@ def register(idvk):
     if (check == False):
         #задание параметров
         lvl = 0
-        attack = 0
-        defence = 0
+        attack = 2
+        defence = 3
         defencemagic = 0
-        dexterity = 0
+        dexterity = 2
         intelligence = 0
-        health = 0
+        health = 4
         xp = 0
         gold = 0
-        points = 5
+        points = 1
         crdate = datetime.datetime.now()
         cursor = con()
         #Инициализация нового игрока
@@ -239,7 +239,7 @@ def generate_reward_for_player(idvk):
     cursor.commit()
     cursor.close()
     print(f'Rewards init for player: {idvk}')
-    status = f'\n\n Награды добавлены. Дла их получения напишите: wipe\n\n'
+    status = f'\n\nПромокоды инициализированы...\n\n'
     return status  
 
 def generate_rune(idvk):
@@ -378,8 +378,8 @@ def creator(idvk):
             target = f'usual'
             points = 2
             statusr = f'\nВы создали необычную руну\n'
-        if (points == 0):
-            status = f'\nНедостаточно обломков для создания руны\n'
+        if (points == 0 or lvl < 1):
+            status = f'\nУ вас должно быть 10 обломков рун определенной редкости для воссоздания руны гарантированно рангом выше.\n Уровень создаваемой руны равен уровню максимально убитого моба!\n'
             print(f'Rune can not create for player {idvk}')
             return status
         status += statusr
@@ -780,65 +780,69 @@ def player_dead(idvk):
     
 def battle_control(idvk):
     #контролер битвы
-    mobcheck = select('mob_current', 'health', idvk)
-    playercheck = select('player_current', 'health', idvk)
-    status = ""
-    if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
-        status += f'\n\nВы бьете воздух, как насчет исследовать дальше?\n'
-        status += f'P.s. жмите кнопку "Исследовать" или повысьте здоровье\n'
-        return status
-    player = select('player', 'dexterity', idvk)
-    mob = select('mob', 'dexterity', idvk)
-    runes = select_equip('rune', 'SUM(dexterity)', idvk)
-    dex = player[0]["dexterity"]
-    if (runes[0]["SUM(dexterity)"] != None):
-        dex = dex + runes[0]["SUM(dexterity)"]
-    status = ""
-    if (dex >= mob[0]["dexterity"]):
-        #атака игрока с преобладающей ловкостью
-        status += player_turn(idvk)
-        #проверка победы игрока
-        winner = player_win(idvk)
-        if (winner != False):
-            status += winner
+    try:
+        mobcheck = select('mob_current', 'health', idvk)
+        playercheck = select('player_current', 'health', idvk)
+        status = ""
+        if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
+            status += f'\n\nВы бьете воздух, как насчет исследовать дальше?\n'
+            status += f'P.s. жмите кнопку "Исследовать"\n'
             return status
-        #проверка на передачу хода игроку
-        """check = player_turn_return(idvk)
-        if (check != False):
-            status += check
-            return status"""
-        #атака моба
-        status += mob_turn(idvk)
-        #проверка на смерть игрока
-        winner = player_dead(idvk)
-        if (winner != False):
-            status += winner
+        player = select('player', 'dexterity', idvk)
+        mob = select('mob', 'dexterity', idvk)
+        runes = select_equip('rune', 'SUM(dexterity)', idvk)
+        dex = player[0]["dexterity"]
+        if (runes[0]["SUM(dexterity)"] != None):
+            dex = dex + runes[0]["SUM(dexterity)"]
+        status = ""
+        if (dex >= mob[0]["dexterity"]):
+            #атака игрока с преобладающей ловкостью
+            status += player_turn(idvk)
+            #проверка победы игрока
+            winner = player_win(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #проверка на передачу хода игроку
+            """check = player_turn_return(idvk)
+            if (check != False):
+                status += check
+                return status"""
+            #атака моба
+            status += mob_turn(idvk)
+            #проверка на смерть игрока
+            winner = player_dead(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #начисление энергии
+            status += battle_add_energy(idvk)
             return status
-        #начисление энергии
-        status += battle_add_energy(idvk)
-        return status
-    else:
-        #атака моба по игроку
-        status += mob_turn(idvk)
-        #проверка на смерть игрока
-        winner = player_dead(idvk)
-        if (winner != False):
-            status += winner
+        else:
+            #атака моба по игроку
+            status += mob_turn(idvk)
+            #проверка на смерть игрока
+            winner = player_dead(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #атака игрока по мобу
+            status += player_turn(idvk)
+            #проверка победы игрока
+            winner = player_win(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #проверка на передачу хода игроку
+            """check = player_turn_return(idvk)
+            if (check != False):
+                status += check
+                return status"""
+            #Начисление энергии
+            status += battle_add_energy(idvk)
             return status
-        #атака игрока по мобу
-        status += player_turn(idvk)
-        #проверка победы игрока
-        winner = player_win(idvk)
-        if (winner != False):
-            status += winner
-            return status
-        #проверка на передачу хода игроку
-        """check = player_turn_return(idvk)
-        if (check != False):
-            status += check
-            return status"""
-        #Начисление энергии
-        status += battle_add_energy(idvk)
+    except:
+        status = f'Нажмите "Исследовать"'
         return status
 
 def lvl_next(idvk):
@@ -1029,11 +1033,11 @@ def rune_unequip(idvk):
 
 def rune_next(idvk):
     #следующая руна
-    rune = select('rune', 'id', idvk)
-    item = select('setting', 'itemid', idvk)
-    itemid = item[0]["itemid"]+1
-    status = ""
     try:
+        rune = select('rune', 'id', idvk)
+        item = select('setting', 'itemid', idvk)
+        itemid = item[0]["itemid"]+1
+        status = ""
         if (rune[itemid]["id"] and itemid <= 20):
             iditem = rune[itemid]["id"]
             check = select_item('rune', 'id', idvk, iditem)
@@ -1056,11 +1060,11 @@ def rune_next(idvk):
 
 def rune_down(idvk):
     #предыдущая руна
-    rune = select('rune', 'id', idvk)
-    item = select('setting', 'itemid', idvk)
-    itemid = item[0]["itemid"]-1
-    status = ""
     try:
+        rune = select('rune', 'id', idvk)
+        item = select('setting', 'itemid', idvk)
+        itemid = item[0]["itemid"]-1
+        status = ""
         if (rune[itemid]["id"] and itemid <= 20 and itemid >= 0):
             iditem = rune[itemid]["id"]
             check = select_item('rune', 'id', idvk, iditem)
@@ -1074,18 +1078,17 @@ def rune_down(idvk):
                 status += f'\n\n🧿Руна {iditem} не обнаружена.\n\n'
                 print(f'Rune {iditem} down not be for player {idvk}')
                 return status
+        else:
+            status += f'\n\n🧿Предыдущая руна не обнаружена.\n\n'
+            print(f'Rune down not found for player {idvk}')
+            return status
     except:
-        status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему элементу предмету.\n\n'
-        update('setting', 'itemid', 0, idvk)
+        count = select('rune', 'COUNT(id)', idvk)
+        status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему предмету.\n\n'
+        update('setting', 'itemid', count[0]["COUNT(id)"]-1, idvk)
         status += print_rune(idvk)
         print(f'Not found down rune for player {idvk}')
         return status
-    count = select('rune', 'COUNT(id)', idvk)
-    status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему предмету.\n\n'
-    update('setting', 'itemid', count[0]["COUNT(id)"]-1, idvk)
-    status += print_rune(idvk)
-    print(f'Not found down rune for player {idvk}')
-    return status
 
 def rune_destroy(idvk, iditem):
     #разпушение руны
@@ -1550,7 +1553,7 @@ def rune_rerol_defence(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        status += f'\n\nИзменить физ. защиту на руне не удалось\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1584,7 +1587,7 @@ def rune_rerol_defencemagic(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        status += f'\n\nИзменить маг. защиту на руне не удалось\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1618,7 +1621,7 @@ def rune_rerol_dexterity(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        status += f'\n\nИзменить ловкость на руне не удалось\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1652,7 +1655,7 @@ def rune_rerol_intelligence(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        status += f'\n\nИзменить интеллект на руне не удалось\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1686,7 +1689,7 @@ def rune_rerol_health(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nИзменить атаку на руне не удалось\n\n'
+        status += f'\n\nИзменить здоровье на руне не удалось\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1695,85 +1698,89 @@ def rune_rerol_health(idvk):
 
 def battle_control_spell(idvk):
     #контролер заклинаний
-    mobcheck = select('mob_current', 'health', idvk)
-    playercheck = select('player_current', 'health', idvk)
-    status = ""
-    if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
-        status += f'\n\nВаше заклинание пронизывает воздух, как насчет исследовать дальше?\n'
-        status += f'P.s. жмите кнопку "Исследовать" или повысьте здоровье\n'
-        return status
-    player = select('player', 'dexterity', idvk)
-    mob = select('mob', 'dexterity', idvk)
-    runes = select_equip('rune', 'SUM(dexterity)', idvk)
-    dex = player[0]["dexterity"]
-    if (runes[0]["SUM(dexterity)"] != None):
-        dex = dex + runes[0]["SUM(dexterity)"]
-    status = ""
-    playermana = select('player_current', 'mana', idvk)
-    mobmana = select('mob_current', 'mana', idvk)
-    playerlvl = select('player', 'lvl', idvk)
-    moblvl = select('mob', 'lvl', idvk)
-    if (dex >= mob[0]["dexterity"]):
-        #атака игрока с преобладающей ловкостью
-        if (playermana[0]["mana"] > moblvl[0]["lvl"]):
-            status += player_attack_defencemagic(idvk)
-        else:
-            status += "\n\nНедостаточно маны для каста спелла\n\n"
-        #проверка победы игрока
-        winner = player_win(idvk)
-        if (winner != False):
-            status += winner
+    try:
+        mobcheck = select('mob_current', 'health', idvk)
+        playercheck = select('player_current', 'health', idvk)
+        status = ""
+        if (mobcheck[0]["health"] <= 0 or playercheck[0]["health"] <= 0):
+            status += f'\n\nВаше заклинание пронизывает воздух, как насчет исследовать дальше?\n'
+            status += f'P.s. жмите кнопку "Исследовать" или повысьте здоровье\n'
             return status
-        #проверка на передачу хода игроку
-        """check = player_turn_return(idvk)
-        if (check != False):
-            status += check
-            return status"""
-        #атака моба
-        if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
-            status += mob_attack_defencemagic(idvk)
-        else:
-            status += "\n\nМоб пропускает свой каст спелла\n\n"
-        #проверка на смерть игрока
-        winner = player_dead(idvk)
-        if (winner != False):
-            status += winner
+        player = select('player', 'dexterity', idvk)
+        mob = select('mob', 'dexterity', idvk)
+        runes = select_equip('rune', 'SUM(dexterity)', idvk)
+        dex = player[0]["dexterity"]
+        if (runes[0]["SUM(dexterity)"] != None):
+            dex = dex + runes[0]["SUM(dexterity)"]
+        status = ""
+        playermana = select('player_current', 'mana', idvk)
+        mobmana = select('mob_current', 'mana', idvk)
+        playerlvl = select('player', 'lvl', idvk)
+        moblvl = select('mob', 'lvl', idvk)
+        if (dex >= mob[0]["dexterity"]):
+            #атака игрока с преобладающей ловкостью
+            if (playermana[0]["mana"] > moblvl[0]["lvl"]):
+                status += player_attack_defencemagic(idvk)
+            else:
+                status += "\n\nНедостаточно маны для каста спелла\n\n"
+            #проверка победы игрока
+            winner = player_win(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #проверка на передачу хода игроку
+            """check = player_turn_return(idvk)
+            if (check != False):
+                status += check
+                return status"""
+            #атака моба
+            if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
+                status += mob_attack_defencemagic(idvk)
+            else:
+                status += "\n\nМоб пропускает свой каст спелла\n\n"
+            #проверка на смерть игрока
+            winner = player_dead(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #начисление энергии
+            status += battle_add_energy(idvk)
+            status += print_battle_turn_mob(idvk)
+            status += print_battle_turn_player(idvk)
             return status
-        #начисление энергии
-        status += battle_add_energy(idvk)
-        status += print_battle_turn_mob(idvk)
-        status += print_battle_turn_player(idvk)
-        return status
-    else:
-        #атака моба по игроку
-        if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
-            status += mob_attack_defencemagic(idvk)
         else:
-            status += "\n\nМоб пропускает свой каст спелла\n\n"
-        #проверка на смерть игрока
-        winner = player_dead(idvk)
-        if (winner != False):
-            status += winner
+            #атака моба по игроку
+            if (mobmana[0]["mana"] > playerlvl[0]["lvl"]):
+                status += mob_attack_defencemagic(idvk)
+            else:
+                status += "\n\nМоб пропускает свой каст спелла\n\n"
+            #проверка на смерть игрока
+            winner = player_dead(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #атака игрока по мобу
+            if (playermana[0]["mana"] > moblvl[0]["lvl"]):
+                status += player_attack_defencemagic(idvk)
+            else:
+                status += "\n\nНедостаточно маны для каста спелла\n\n"
+            #проверка победы игрока
+            winner = player_win(idvk)
+            if (winner != False):
+                status += winner
+                return status
+            #проверка на передачу хода игроку
+            """check = player_turn_return(idvk)
+            if (check != False):
+                status += check
+                return status"""
+            #Начисление энергии
+            status += battle_add_energy(idvk)
+            status += print_battle_turn_mob(idvk)
+            status += print_battle_turn_player(idvk)
             return status
-        #атака игрока по мобу
-        if (playermana[0]["mana"] > moblvl[0]["lvl"]):
-            status += player_attack_defencemagic(idvk)
-        else:
-            status += "\n\nНедостаточно маны для каста спелла\n\n"
-        #проверка победы игрока
-        winner = player_win(idvk)
-        if (winner != False):
-            status += winner
-            return status
-        #проверка на передачу хода игроку
-        """check = player_turn_return(idvk)
-        if (check != False):
-            status += check
-            return status"""
-        #Начисление энергии
-        status += battle_add_energy(idvk)
-        status += print_battle_turn_mob(idvk)
-        status += print_battle_turn_player(idvk)
+    except:
+        status = f'Нажмите "Исследовать"'
         return status
 
 def player_attack_defencemagic(idvk):

@@ -11,7 +11,6 @@ async def main():
             while True:
                 #longpoll
                 await get_longpoll()
-                #генерация ответа пользователю
         except vk_api.VkApiError as error_msg:
             print(f'problem char --> {error_msg}')
 asyncio.run(main())

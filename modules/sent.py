@@ -5,7 +5,7 @@ from modules.sqlite.engine import keyboards
 
 async def sent(vk, user_id, get_randid, mes, text):
     #запуск события печати
-    vk.messages.setActivity(type='typing', peer_id = int(user_id))
+    #vk.messages.setActivity(type='typing', peer_id = int(user_id))
     keyboard = keyboards(text)
     try:
         if (keyboard != False):
