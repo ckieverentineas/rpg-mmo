@@ -1079,8 +1079,11 @@ def rune_down(idvk):
                 print(f'Rune {iditem} down not be for player {idvk}')
                 return status
         else:
-            status += f'\n\n🧿Предыдущая руна не обнаружена.\n\n'
-            print(f'Rune down not found for player {idvk}')
+            count = select('rune', 'COUNT(id)', idvk)
+            status += f'\n\nПредыдущая руна не обнаружена, переход к последнему предмету.\n\n'
+            update('setting', 'itemid', count[0]["COUNT(id)"]-1, idvk)
+            status += print_rune(idvk)
+            print(f'Not found down rune for player {idvk}')
             return status
     except:
         count = select('rune', 'COUNT(id)', idvk)
