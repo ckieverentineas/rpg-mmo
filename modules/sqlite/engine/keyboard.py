@@ -36,10 +36,10 @@ def keyboards(text):
         "~лвк": keyboard_altar_rune_rerol,
         "~инт": keyboard_altar_rune_rerol,
         "~здр": keyboard_altar_rune_rerol,
-        "+ур10": keyboard_back,
-        "-ур10": keyboard_back,
-        "+ур100": keyboard_back,
-        "-ур100": keyboard_back,
+        "+ур10": keyboard_lvl,
+        "-ур10": keyboard_lvl,
+        "+ур100": keyboard_lvl,
+        "-ур100": keyboard_lvl,
         "спелл": keyboard_battle,
         "инвентарь": keyboard_back
     }
@@ -55,8 +55,8 @@ def keyboard_lvl():
     keyboards.add_button('-ур10', color=VkKeyboardColor.POSITIVE)
     keyboards.add_button('+ур10', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
-    keyboards.add_button('-100', color=VkKeyboardColor.POSITIVE)
-    keyboards.add_button('+100', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('-ур100', color=VkKeyboardColor.POSITIVE)
+    keyboards.add_button('+ур100', color=VkKeyboardColor.POSITIVE)
     keyboards.add_line()
     keyboards.add_button('-ур', color=VkKeyboardColor.SECONDARY)
     keyboards.add_button('+ур', color=VkKeyboardColor.SECONDARY)

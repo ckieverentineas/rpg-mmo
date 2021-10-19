@@ -888,24 +888,24 @@ def lvl_down10(idvk):
     #смена локации вниз
     lvlloc = select('setting', 'lvl', idvk)
     lvl =lvlloc[0]["lvl"]
-    if (lvl >= 1):
+    if (lvl >= 10):
         update('setting', 'lvl', lvl-10, idvk)
         print(f'Level down on {lvl-10} for {idvk}')
         status = f'📝Вы пошли в сторону света на {lvl-10} аршина'
         return status
-    status = f'Никто, асбсолютно никто там еще не был!'
+    status = f'Вы на уровне {lvl}, нажмите -ур'
     return status
 
 def lvl_down100(idvk):
     #смена локации вниз
     lvlloc = select('setting', 'lvl', idvk)
     lvl =lvlloc[0]["lvl"]
-    if (lvl >= 1):
+    if (lvl >= 100):
         update('setting', 'lvl', lvl-100, idvk)
         print(f'Level down on {lvl-100} for {idvk}')
         status = f'📝Вы пошли в сторону света на {lvl-100} аршина'
         return status
-    status = f'Никто, асбсолютно никто там еще не был!'
+    status = f'Вы на уровне {lvl}, нажмите -ур10'
     return status
 
 def player_lvl_up(idvk):
