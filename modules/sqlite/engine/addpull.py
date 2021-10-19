@@ -1052,7 +1052,7 @@ def rune_next(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nСледующая рунна не обнаружена, переход к первому предмету.\n\n'
+        status += f'\n\nСледующая руна не обнаружена, переход к первому предмету.\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found next rune for player {idvk}')
@@ -1084,7 +1084,7 @@ def rune_down(idvk):
             return status
     except:
         count = select('rune', 'COUNT(id)', idvk)
-        status += f'\n\nПредыдущая рунна не обнаружена, переход к последнему предмету.\n\n'
+        status += f'\n\nПредыдущая руна не обнаружена, переход к последнему предмету.\n\n'
         update('setting', 'itemid', count[0]["COUNT(id)"]-1, idvk)
         status += print_rune(idvk)
         print(f'Not found down rune for player {idvk}')
@@ -1306,7 +1306,7 @@ def altar(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nТекущая рунна не обнаружена, переход к первому предмету.\n\n'
+        status += f'\n\nТекущая руна не обнаружена, переход к первому предмету.\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
@@ -1485,7 +1485,7 @@ def rune_rerol(idvk):
                 print(f'Rune {iditem} not be for player {idvk}')
                 return status
     except:
-        status += f'\n\nВыбранная рунна не обнаружена, переход к первому предмету.\n\n'
+        status += f'\n\nВыбранная руна не обнаружена, переход к первому предмету.\n\n'
         update('setting', 'itemid', 0, idvk)
         status += print_rune(idvk)
         print(f'Not found current rune for player {idvk}')
